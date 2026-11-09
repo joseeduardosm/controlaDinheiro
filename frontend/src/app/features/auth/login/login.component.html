@@ -1,0 +1,201 @@
+<div class="pagina">
+  <!-- Degradê decorativo de fundo -->
+  <div class="fundo-degradê" aria-hidden="true"></div>
+
+  <div class="container">
+
+    <!-- Marca -->
+    <div class="marca">
+      <!-- Símbolo: dois anéis entrelaçados em ouro metálico -->
+      <svg class="marca-simbolo" viewBox="0 0 80 56" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <linearGradient id="ouro-corpo" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"   stop-color="#f8ecb2"/>
+            <stop offset="30%"  stop-color="#ecda98"/>
+            <stop offset="62%"  stop-color="#b8902a"/>
+            <stop offset="100%" stop-color="#e8d690"/>
+          </linearGradient>
+          <linearGradient id="ouro-frente" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"   stop-color="#fff4c8"/>
+            <stop offset="45%"  stop-color="#f0d870"/>
+            <stop offset="100%" stop-color="#c8a030"/>
+          </linearGradient>
+          <radialGradient id="halo-elo" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"   stop-color="#f0d870" stop-opacity="0.35"/>
+            <stop offset="100%" stop-color="#f0d870" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <!-- Halo suave no ponto de interlaçamento -->
+        <ellipse cx="40" cy="28" rx="11" ry="11" fill="url(#halo-elo)"/>
+        <!-- Anel esquerdo -->
+        <circle cx="27" cy="28" r="16" stroke="url(#ouro-corpo)" stroke-width="5.5" fill="none"/>
+        <!-- Anel direito (atrás) -->
+        <circle cx="53" cy="28" r="16" stroke="url(#ouro-corpo)" stroke-width="5.5" fill="none"/>
+        <!-- Máscara: esconde a parte do anel esquerdo que fica atrás do direito -->
+        <path d="M 40 13.2 A 16 16 0 0 0 40 42.8" stroke="var(--fundo-mascara)" stroke-width="8" fill="none"/>
+        <!-- Arco frontal do anel esquerdo passando na frente -->
+        <path d="M 40 13.2 A 16 16 0 0 1 40 42.8" stroke="url(#ouro-frente)" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+        <!-- Ponto de luz no topo do interlaçamento -->
+        <ellipse cx="40" cy="13.5" rx="2.5" ry="1.4" fill="#fff4c8" opacity="0.65"/>
+      </svg>
+      <h1 class="marca-nome">elo.</h1>
+      <p class="marca-slogan">suas finanças, do seu jeito</p>
+    </div>
+
+    <!-- Card principal -->
+    <div class="card">
+
+      <div class="card-cabecalho">
+        <h2 class="card-titulo">{{ ehLogin ? 'Entrar' : 'Criar conta' }}</h2>
+        <p class="card-subtitulo">
+          {{ ehLogin ? 'Acesse sua conta' : 'Comece agora, é grátis' }}
+        </p>
+      </div>
+
+      <!-- Formulário de login -->
+      @if (ehLogin) {
+        <form [formGroup]="formularioLogin" (ngSubmit)="aoEnviar()" class="formulario" novalidate>
+
+          <div class="campo">
+            <label class="rotulo" for="login-email">E-MAIL</label>
+            <input
+              id="login-email"
+              type="email"
+              formControlName="email"
+              placeholder="seu@email.com"
+              class="entrada"
+              [class.entrada-erro]="erroCampo('login', 'email')"
+              autocomplete="email"
+            />
+            @if (erroCampo('login', 'email'); as mensagem) {
+              <span class="erro">{{ mensagem }}</span>
+            }
+          </div>
+
+          <div class="campo">
+            <label class="rotulo" for="login-senha">SENHA</label>
+            <div class="entrada-com-icone">
+              <input
+                id="login-senha"
+                [type]="mostrarSenha() ? 'text' : 'password'"
+                formControlName="senha"
+                placeholder="••••••••"
+                class="entrada"
+                [class.entrada-erro]="erroCampo('login', 'senha')"
+                autocomplete="current-password"
+              />
+              <button
+                type="button"
+                class="botao-olho"
+                (click)="alternarVisibilidadeSenha()"
+                tabindex="-1"
+                [attr.aria-label]="mostrarSenha() ? 'Ocultar senha' : 'Mostrar senha'"
+              >
+                {{ mostrarSenha() ? '◎' : '○' }}
+              </button>
+            </div>
+            @if (erroCampo('login', 'senha'); as mensagem) {
+              <span class="erro">{{ mensagem }}</span>
+            }
+          </div>
+
+          <!-- Erro retornado pela API -->
+          @if (erroApi()) {
+            <div class="erro-api">{{ erroApi() }}</div>
+          }
+
+          <button type="submit" class="botao-primario" [disabled]="carregando()">
+            @if (carregando()) { AGUARDE... } @else { ENTRAR ▸ }
+          </button>
+
+        </form>
+      }
+
+      <!-- Formulário de cadastro -->
+      @if (!ehLogin) {
+        <form [formGroup]="formularioCadastro" (ngSubmit)="aoEnviar()" class="formulario" novalidate>
+
+          <div class="campo">
+            <label class="rotulo" for="cad-nome">NOME</label>
+            <input
+              id="cad-nome"
+              type="text"
+              formControlName="nome"
+              placeholder="Seu nome"
+              class="entrada"
+              [class.entrada-erro]="erroCampo('cadastro', 'nome')"
+              autocomplete="name"
+            />
+            @if (erroCampo('cadastro', 'nome'); as mensagem) {
+              <span class="erro">{{ mensagem }}</span>
+            }
+          </div>
+
+          <div class="campo">
+            <label class="rotulo" for="cad-email">E-MAIL</label>
+            <input
+              id="cad-email"
+              type="email"
+              formControlName="email"
+              placeholder="seu@email.com"
+              class="entrada"
+              [class.entrada-erro]="erroCampo('cadastro', 'email')"
+              autocomplete="email"
+            />
+            @if (erroCampo('cadastro', 'email'); as mensagem) {
+              <span class="erro">{{ mensagem }}</span>
+            }
+          </div>
+
+          <div class="campo">
+            <label class="rotulo" for="cad-senha">SENHA</label>
+            <div class="entrada-com-icone">
+              <input
+                id="cad-senha"
+                [type]="mostrarSenha() ? 'text' : 'password'"
+                formControlName="senha"
+                placeholder="mín. 4 dígitos"
+                class="entrada"
+                [class.entrada-erro]="erroCampo('cadastro', 'senha')"
+                autocomplete="new-password"
+              />
+              <button
+                type="button"
+                class="botao-olho"
+                (click)="alternarVisibilidadeSenha()"
+                tabindex="-1"
+                [attr.aria-label]="mostrarSenha() ? 'Ocultar senha' : 'Mostrar senha'"
+              >
+                {{ mostrarSenha() ? '◎' : '○' }}
+              </button>
+            </div>
+            @if (erroCampo('cadastro', 'senha'); as mensagem) {
+              <span class="erro">{{ mensagem }}</span>
+            }
+          </div>
+
+          <!-- Erro retornado pela API -->
+          @if (erroApi()) {
+            <div class="erro-api">{{ erroApi() }}</div>
+          }
+
+          <button type="submit" class="botao-primario" [disabled]="carregando()">
+            @if (carregando()) { AGUARDE... } @else { CRIAR CONTA ▸ }
+          </button>
+
+        </form>
+      }
+
+      <!-- Alternar entre login e cadastro -->
+      <div class="alternar">
+        <span class="alternar-texto">
+          {{ ehLogin ? 'Não tem conta?' : 'Já tem conta?' }}
+        </span>
+        <button class="botao-alternar" (click)="alternarModo()">
+          {{ ehLogin ? 'CADASTRE-SE →' : 'ENTRAR →' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

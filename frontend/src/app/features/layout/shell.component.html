@@ -1,0 +1,61 @@
+<div class="shell">
+
+  <!-- ─── Topbar ─────────────────────────────────────────────────────────── -->
+  <header class="topbar">
+    <div class="topbar-interior">
+
+      <!-- Logo + links de navegação -->
+      <nav class="topbar-nav" aria-label="Navegação principal">
+
+        <a routerLink="/dashboard" class="topbar-marca">
+          <!-- Anéis entrelaçados compactos -->
+          <svg class="topbar-aneis" viewBox="0 0 48 34" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <linearGradient id="tb-ouro" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%"   stop-color="#f8ecb2"/>
+                <stop offset="45%"  stop-color="#c8a030"/>
+                <stop offset="100%" stop-color="#e8d690"/>
+              </linearGradient>
+            </defs>
+            <circle cx="16" cy="17" r="10" stroke="url(#tb-ouro)" stroke-width="3.5" fill="none"/>
+            <circle cx="32" cy="17" r="10" stroke="url(#tb-ouro)" stroke-width="3.5" fill="none"/>
+            <path d="M 24 7.5 A 10 10 0 0 0 24 26.5" stroke="var(--color-parchment)" stroke-width="5" fill="none"/>
+            <path d="M 24 7.5 A 10 10 0 0 1 24 26.5" stroke="url(#tb-ouro)" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          </svg>
+          <span class="topbar-marca-nome">elo.</span>
+        </a>
+
+        <div class="topbar-links">
+          <a routerLink="/dashboard"   routerLinkActive="link-ativo" [routerLinkActiveOptions]="{exact:true}" class="topbar-link">INÍCIO</a>
+          <a routerLink="/receitas"    routerLinkActive="link-ativo" class="topbar-link">RECEITAS</a>
+          <a routerLink="/despesas"    routerLinkActive="link-ativo" class="topbar-link">DESPESAS</a>
+          <a routerLink="/casal"       routerLinkActive="link-ativo" class="topbar-link">CASAL</a>
+          <a routerLink="/conquistas"  routerLinkActive="link-ativo" class="topbar-link">CONQUISTAS</a>
+          <a routerLink="/cartoes"     routerLinkActive="link-ativo" class="topbar-link">CARTÕES</a>
+          <a routerLink="/relatorios"  routerLinkActive="link-ativo" class="topbar-link">RELATÓRIOS</a>
+        </div>
+
+      </nav>
+
+      <!-- Usuário + sair -->
+      <div class="topbar-acoes">
+        @if (auth.usuarioAtual()) {
+          <span class="topbar-usuario">{{ auth.usuarioAtual()!.nome }}</span>
+        }
+        <button class="botao-sair" type="button" (click)="auth.sair()">SAIR</button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ─── Conteúdo da página ───────────────────────────────────────────────── -->
+  <main class="conteudo">
+    <router-outlet />
+  </main>
+
+</div>
+
+<!-- Modal bloqueante — aparece sobre o shell inteiro quando há pendências -->
+@if (mostrarModal()) {
+  <app-modal-aprovacao (concluido)="aoModalConcluir()" />
+}

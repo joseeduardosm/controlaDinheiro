@@ -1,0 +1,164 @@
+<!-- Dashboard principal — dados reais via API -->
+<div class="pagina">
+  <div class="interior">
+
+    <!-- ─── Saudação + navegador de mês ────────────────────────────────── -->
+    <section class="saudacao">
+      <div>
+        <h1 class="saudacao-titulo">Olá, {{ primeiroNome }}</h1>
+        <p class="saudacao-data">Resumo financeiro de {{ rotuloPeriodo() }}</p>
+      </div>
+      <div class="mes-nav">
+        <button class="mes-btn" type="button" (click)="mesAnterior()" aria-label="Mês anterior">‹</button>
+        <span class="mes-rotulo">{{ rotuloPeriodo() }}</span>
+        <button class="mes-btn" type="button" (click)="proximoMes()" aria-label="Próximo mês">›</button>
+      </div>
+    </section>
+
+    <!-- ─── Estado: carregando ───────────────────────────────────────────── -->
+    @if (carregando()) {
+      <div class="estado-carregando">
+        <div class="carregando-grade">
+          <div class="skeleton"></div>
+          <div class="skeleton"></div>
+          <div class="skeleton"></div>
+          <div class="skeleton"></div>
+        </div>
+      </div>
+    }
+
+    <!-- ─── Dados carregados ─────────────────────────────────────────────── -->
+    @if (!carregando() && resumo(); as r) {
+
+      <!-- ─── Tiles de resumo ─────────────────────────────────────────── -->
+      <section class="grade-tiles" aria-label="Resumo do mês">
+
+        <!-- Saldo: tile principal — verde se positivo, coral se negativo -->
+        <a routerLink="/despesas" class="tile tile--destaque" [class.tile--negativo]="!saldoPositivo()">
+          <span class="tile-rotulo">SALDO DO MÊS</span>
+          <span class="tile-valor">
+            {{ saldoPositivo() ? '' : '−' }}{{ moeda(r.saldo) }}
+          </span>
+          <span class="tile-variacao">
+            {{ r.receitas.quantidade }} receita{{ r.receitas.quantidade !== 1 ? 's' : '' }} · {{ r.despesas.quantidade }} despesa{{ r.despesas.quantidade !== 1 ? 's' : '' }}
+          </span>
+          <span class="tile-seta" aria-hidden="true">→</span>
+        </a>
+
+        <!-- Receitas: tint mint -->
+        <a routerLink="/receitas" class="tile" style="background: rgba(167, 252, 205, 0.20)">
+          <span class="tile-rotulo">RECEITAS</span>
+          <span class="tile-valor">{{ moeda(r.receitas.total) }}</span>
+          <span class="tile-variacao tile-variacao--ok">
+            {{ moeda(r.receitas.recebido) }} recebido
+          </span>
+          <span class="tile-seta" aria-hidden="true">→</span>
+        </a>
+
+        <!-- Despesas: tint coral -->
+        <a routerLink="/despesas" class="tile" style="background: rgba(255, 148, 115, 0.10)">
+          <span class="tile-rotulo">DESPESAS</span>
+          <span class="tile-valor">{{ moeda(r.despesas.total) }}</span>
+          <span class="tile-variacao">
+            {{ moeda(r.despesas.pago) }} pago
+          </span>
+          <span class="tile-seta" aria-hidden="true">→</span>
+        </a>
+
+        <!-- A pagar: tint gold se houver pendências -->
+        <a routerLink="/despesas" class="tile"
+          [style.background]="r.despesas.pendente > 0 ? 'rgba(236, 218, 152, 0.22)' : '#fff'">
+          <span class="tile-rotulo">A PAGAR</span>
+          <span class="tile-valor">{{ moeda(r.despesas.pendente) }}</span>
+          <span class="tile-variacao">
+            @if (r.receitas.pendente > 0) {
+              + {{ moeda(r.receitas.pendente) }} a receber
+            } @else {
+              nenhuma receita pendente
+            }
+          </span>
+          <span class="tile-seta" aria-hidden="true">→</span>
+        </a>
+
+      </section>
+
+      <!-- ─── Balanço do casal (só aparece se houver parceiros) ──────── -->
+      @if (r.balanco_casal.length > 0) {
+        <section class="secao">
+          <div class="secao-cabecalho">
+            <h2 class="secao-titulo">Casal</h2>
+            <a routerLink="/casal" class="link-todos">VER DETALHES →</a>
+          </div>
+          <div class="grade-casal">
+            @for (item of r.balanco_casal; track item.parceiro_email) {
+              <a routerLink="/casal" class="card-casal" [style.background]="fundoBalanco(item.saldo)">
+                <div class="casal-parceiro">{{ item.parceiro_nome ?? item.parceiro_email }}</div>
+                <div class="casal-rotulo">{{ rotuloSaldoCasal(item) }}</div>
+                <div class="casal-saldo">{{ moeda(item.saldo) }}</div>
+                <span class="tile-seta" aria-hidden="true">→</span>
+              </a>
+            }
+          </div>
+        </section>
+      }
+
+      <!-- ─── Grade inferior: lançamentos + conquistas ──────────────── -->
+      <div class="grade-inferior">
+
+        <!-- Lançamentos recentes -->
+        <section class="secao">
+          <div class="secao-cabecalho">
+            <h2 class="secao-titulo">Lançamentos recentes</h2>
+            <a routerLink="/despesas" class="link-todos">VER TODOS →</a>
+          </div>
+
+          @if (lancamentos().length === 0) {
+            <div class="lista-vazia">
+              Nenhum lançamento em {{ rotuloPeriodo() }}
+            </div>
+          } @else {
+            <div class="lista-lancamentos">
+              @for (l of lancamentos(); track l.descricao + l.data) {
+                <a class="lancamento" [routerLink]="ehReceita(l) ? '/receitas' : '/despesas'">
+                  <!-- Ícone semântico -->
+                  <span class="lancamento-icone" [class.lancamento-icone--receita]="ehReceita(l)" aria-hidden="true">
+                    {{ ehReceita(l) ? '↑' : '↓' }}
+                  </span>
+                  <div class="lancamento-info">
+                    <span class="lancamento-descricao">{{ l.descricao }}</span>
+                    <span class="lancamento-categoria">
+                      {{ ehReceita(l) ? 'Receita' : 'Despesa' }} · {{ l.situacao === 'pago' || l.situacao === 'recebido' ? 'confirmado' : 'pendente' }}
+                    </span>
+                  </div>
+                  <div class="lancamento-direita">
+                    <span class="lancamento-valor" [class.lancamento-valor--receita]="ehReceita(l)">
+                      {{ ehReceita(l) ? '+' : '−' }}{{ moeda(l.valor) }}
+                    </span>
+                    <span class="lancamento-data">{{ dataCurta(l.data) }}</span>
+                  </div>
+                </a>
+              }
+            </div>
+          }
+        </section>
+
+        <!-- Conquistas -->
+        <section class="secao">
+          <div class="secao-cabecalho">
+            <h2 class="secao-titulo">Conquistas</h2>
+          </div>
+          <div class="conquistas-breve">
+            <div class="breve-icone" aria-hidden="true">◎</div>
+            <p class="breve-texto">Metas de poupança em breve</p>
+            <span class="breve-dica">
+              Crie projetos com meta e prazo — acompanhe seu progresso aqui.
+            </span>
+          </div>
+        </section>
+
+      </div>
+
+    }
+
+  </div>
+</div>

@@ -1,0 +1,398 @@
+<!-- Página de cartões de crédito e faturas -->
+<div class="cartoes">
+
+  <!-- ─── Cabeçalho ──────────────────────────────────────────────────────── -->
+  <div class="pagina-cabecalho">
+    <div>
+      <h1 class="pagina-titulo">Cartões</h1>
+      <p class="pagina-subtitulo">Faturas e lançamentos parcelados</p>
+    </div>
+    <button class="botao-novo" type="button" (click)="abrirNovoCartao()">
+      NOVO CARTÃO ▸
+    </button>
+  </div>
+
+  <!-- ─── Selector de cartões ────────────────────────────────────────────── -->
+  @if (cartoes().length > 0) {
+    <div class="cartoes-chips">
+      @for (c of cartoes(); track c.id) {
+        @if (idCartaoParaRemover() === c.id) {
+          <!-- Chip em confirmação de remoção -->
+          <div class="chip chip--removendo">
+            <span class="chip-texto">Remover "{{ c.banco }}"?</span>
+            <div class="chip-remocao-acoes">
+              <button type="button" (click)="removerCartao()" [disabled]="removendoCartao()">
+                @if (removendoCartao()) { ... } @else { SIM }
+              </button>
+              <button type="button" (click)="cancelarRemocaoCartao()">NÃO</button>
+            </div>
+          </div>
+        } @else {
+          <div class="chip"
+            [class.chip--ativo]="cartaoSelecionado()?.id === c.id"
+            (click)="selecionarCartao(c)"
+            role="button" tabindex="0">
+            <span class="chip-banco">{{ c.banco }}</span>
+            <span class="chip-datas">fecha {{ c.fechamento }} · vence {{ c.vencimento }}</span>
+            <div class="chip-acoes">
+              <button class="chip-btn-acao" type="button" (click)="abrirEdicaoCartao(c, $event)" title="Editar">✎</button>
+              <button class="chip-btn-acao chip-btn-remover" type="button"
+                (click)="$event.stopPropagation(); confirmarRemocaoCartao(c.id)" title="Remover">✕</button>
+            </div>
+          </div>
+        }
+      }
+    </div>
+  }
+
+  <!-- ─── Sem cartões ──────────────────────────────────────────────────────── -->
+  @if (cartoes().length === 0) {
+    <div class="estado-vazio">
+      <div class="vazio-icone" aria-hidden="true">▭</div>
+      <p class="vazio-texto">Nenhum cartão cadastrado</p>
+      <span class="vazio-dica">Cadastre seu primeiro cartão para registrar faturas e lançamentos parcelados.</span>
+      <button class="botao-vazio" type="button" (click)="abrirNovoCartao()">Cadastrar cartão</button>
+    </div>
+  }
+
+  <!-- ─── Painel da fatura (só quando há cartão selecionado) ────────────── -->
+  @if (cartaoSelecionado()) {
+
+    <!-- Navegação de mês -->
+    <div class="mes-nav">
+      <button class="mes-btn" type="button" (click)="mesAnterior()" aria-label="Mês anterior">‹</button>
+      <span class="mes-rotulo">{{ rotuloPeriodo() }}</span>
+      <button class="mes-btn" type="button" (click)="proximoMes()" aria-label="Próximo mês">›</button>
+    </div>
+
+    <!-- Tiles de resumo da fatura -->
+    <div class="tiles">
+      <div class="tile tile--total">
+        <span class="tile-rotulo">TOTAL DA FATURA</span>
+        <span class="tile-valor">{{ moeda(resumo().total) }}</span>
+        <span class="tile-detalhe">{{ resumo().quantidade }} lançamento{{ resumo().quantidade !== 1 ? 's' : '' }}</span>
+      </div>
+      <div class="tile tile--pago">
+        <span class="tile-rotulo">PAGO</span>
+        <span class="tile-valor">{{ moeda(resumo().pago) }}</span>
+      </div>
+      <div class="tile tile--pendente">
+        <span class="tile-rotulo">A PAGAR</span>
+        <span class="tile-valor">{{ moeda(resumo().pendente) }}</span>
+      </div>
+    </div>
+
+    <!-- Botão de novo lançamento -->
+    <div class="lista-cabecalho">
+      <span class="lista-titulo">Lançamentos</span>
+      <button class="botao-novo-lanc" type="button" (click)="abrirNovoLancamento()">
+        + NOVO LANÇAMENTO
+      </button>
+    </div>
+
+    <!-- Estado de carregando -->
+    @if (carregando()) {
+      <div class="estado-carregando">carregando fatura...</div>
+    }
+
+    <!-- Erro -->
+    @if (erroLista()) {
+      <div class="estado-erro">{{ erroLista() }}</div>
+    }
+
+    <!-- Tabela de lançamentos -->
+    @if (!carregando() && lancamentos().length > 0) {
+      <div class="tabela-wrapper">
+        <table class="tabela">
+          <thead>
+            <tr>
+              <th (click)="ordenarPor('data_vencimento')" class="th-clicavel">
+                VENCIMENTO <span class="ord-icone">{{ iconeOrdem('data_vencimento') }}</span>
+              </th>
+              <th (click)="ordenarPor('descricao')" class="th-clicavel">
+                DESCRIÇÃO <span class="ord-icone">{{ iconeOrdem('descricao') }}</span>
+              </th>
+              <th (click)="ordenarPor('parcela')" class="th-clicavel th-centro">
+                PARCELAS <span class="ord-icone">{{ iconeOrdem('parcela') }}</span>
+              </th>
+              <th (click)="ordenarPor('valor_parcela')" class="th-clicavel th-dir">
+                VALOR <span class="ord-icone">{{ iconeOrdem('valor_parcela') }}</span>
+              </th>
+              <th class="th-centro">DIVIDIDO</th>
+              <th (click)="ordenarPor('situacao')" class="th-clicavel th-centro">
+                SITUAÇÃO <span class="ord-icone">{{ iconeOrdem('situacao') }}</span>
+              </th>
+              <th class="th-acoes">AÇÕES</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (lanc of lancamentosOrdenados(); track lanc.id) {
+
+              <!-- Linha de confirmação de remoção -->
+              @if (idParaRemover() === lanc.id) {
+                <tr class="linha-remocao">
+                  <td colspan="7">
+                    <div class="remocao-conteudo">
+                      <span>Remover "{{ lanc.descricao }}" ({{ rotuloParcela(lanc) }})?</span>
+                      <div class="remocao-acoes">
+                        <button class="btn-confirmar-remocao" type="button" (click)="removerLancamento()" [disabled]="removendo()">
+                          @if (removendo()) { REMOVENDO... } @else { REMOVER }
+                        </button>
+                        <button class="btn-cancelar-remocao" type="button" (click)="cancelarRemocao()">CANCELAR</button>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              }
+
+              <!-- Linha normal -->
+              @if (idParaRemover() !== lanc.id) {
+                <tr class="linha">
+                  <td class="td-data">{{ formatarDataCurta(lanc.data_vencimento) }}</td>
+                  <td class="td-descricao">{{ lanc.descricao }}</td>
+                  <td class="td-centro">
+                    <span class="badge-parcela">{{ rotuloParcela(lanc) }}</span>
+                  </td>
+                  <td class="td-dir td-valor">{{ moeda(lanc.valor_parcela) }}</td>
+                  <td class="td-centro">
+                    @if (lanc.dividido_email) {
+                      <span class="badge-dividido" [title]="lanc.dividido_email">
+                        {{ lanc.dividido_porcentagem }}%
+                      </span>
+                    } @else {
+                      <span class="sem-divisao">—</span>
+                    }
+                  </td>
+                  <td class="td-centro">
+                    <button class="badge-situacao"
+                      [class.badge-situacao--pago]="lanc.situacao === 'pago'"
+                      [class.badge-situacao--pendente]="lanc.situacao === 'pendente'"
+                      (click)="alternarSituacao(lanc)"
+                      type="button"
+                      title="Clique para alternar">
+                      {{ lanc.situacao === 'pago' ? 'Pago' : 'Pendente' }}
+                    </button>
+                  </td>
+                  <td class="td-acoes">
+                    <div class="acoes-linha">
+                      <button class="btn-acao btn-editar" type="button"
+                        (click)="abrirEdicaoLancamento(lanc)" title="Editar">✎</button>
+                      <button class="btn-acao btn-remover" type="button"
+                        (click)="confirmarRemocao(lanc.id)" title="Remover">✕</button>
+                    </div>
+                  </td>
+                </tr>
+              }
+
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    <!-- Fatura vazia neste mês -->
+    @if (!carregando() && !erroLista() && lancamentos().length === 0) {
+      <div class="fatura-vazia">
+        <p class="vazio-texto-sm">Nenhum lançamento nesta fatura</p>
+        <span class="vazio-dica">Clique em "+ NOVO LANÇAMENTO" para adicionar.</span>
+      </div>
+    }
+
+  }
+
+</div>
+
+<!-- ─── Modal de lançamento ─────────────────────────────────────────────────── -->
+@if (mostrarFormLancamento()) {
+  <div class="overlay" (click)="fecharFormLancamento()" role="dialog" aria-modal="true">
+    <div class="modal-form" (click)="$event.stopPropagation()">
+
+      <div class="modal-cabecalho">
+        <h2 class="modal-titulo">{{ lancamentoEmEdicao() ? 'Editar lançamento' : 'Novo lançamento' }}</h2>
+        <button class="botao-fechar" type="button" (click)="fecharFormLancamento()">✕</button>
+      </div>
+
+      @if (sucessoFormLanc()) {
+        <div class="form-sucesso">
+          ✓ Lançamento {{ lancamentoEmEdicao() ? 'atualizado' : 'registrado' }} com sucesso!
+        </div>
+      } @else {
+        <form class="formulario" (ngSubmit)="salvarLancamento()">
+
+          <!-- Descrição -->
+          <div class="campo-grupo">
+            <label class="campo-rotulo" for="l-desc">DESCRIÇÃO</label>
+            <input id="l-desc" class="campo-input" type="text"
+              [ngModel]="formLancamento.descricao()" (ngModelChange)="formLancamento.descricao.set($event)"
+              name="descricao" placeholder="Ex: iPhone, Viagem, Supermercado..." autocomplete="off" />
+          </div>
+
+          <!-- Toggle modo de valor -->
+          @if (!lancamentoEmEdicao()) {
+            <div class="toggle-modo">
+              <button type="button" class="toggle-btn"
+                [class.toggle-btn--ativo]="modoValor() === 'total'"
+                (click)="modoValor.set('total')">Valor Total</button>
+              <button type="button" class="toggle-btn"
+                [class.toggle-btn--ativo]="modoValor() === 'parcela'"
+                (click)="modoValor.set('parcela')">Valor por Parcela</button>
+            </div>
+          }
+
+          <!-- Valor + Parcelas -->
+          <div class="campo-linha">
+            @if (modoValor() === 'total') {
+              <div class="campo-grupo">
+                <label class="campo-rotulo" for="l-total">VALOR TOTAL (R$)</label>
+                <input id="l-total" class="campo-input" type="text" inputmode="decimal"
+                  [ngModel]="formLancamento.valorTotal()" (ngModelChange)="formLancamento.valorTotal.set($event)"
+                  name="valorTotal" placeholder="0,00" />
+              </div>
+            } @else {
+              <div class="campo-grupo">
+                <label class="campo-rotulo" for="l-parcela">VALOR DA PARCELA (R$)</label>
+                <input id="l-parcela" class="campo-input" type="text" inputmode="decimal"
+                  [ngModel]="formLancamento.valorParcela()" (ngModelChange)="formLancamento.valorParcela.set($event)"
+                  name="valorParcela" placeholder="0,00" />
+              </div>
+            }
+            <div class="campo-grupo">
+              <label class="campo-rotulo" for="l-nparcelas">Nº PARCELAS</label>
+              <input id="l-nparcelas" class="campo-input" type="number" min="1" max="120"
+                [ngModel]="formLancamento.nParcelas()" (ngModelChange)="formLancamento.nParcelas.set($event)"
+                name="nParcelas" placeholder="1" />
+            </div>
+          </div>
+
+          <!-- Data + Situação -->
+          <div class="campo-linha">
+            <div class="campo-grupo">
+              <label class="campo-rotulo" for="l-data">DATA DA COMPRA</label>
+              <input id="l-data" class="campo-input" type="date"
+                [ngModel]="formLancamento.dataCompra()" (ngModelChange)="formLancamento.dataCompra.set($event)"
+                name="dataCompra" />
+            </div>
+            <div class="campo-grupo">
+              <label class="campo-rotulo" for="l-situacao">SITUAÇÃO</label>
+              <select id="l-situacao" class="campo-input campo-select"
+                [ngModel]="formLancamento.situacao()" (ngModelChange)="formLancamento.situacao.set($event)"
+                name="situacao">
+                <option value="pendente">Pendente</option>
+                <option value="pago">Pago</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Toggle dividir -->
+          <div class="campo-grupo">
+            <label class="campo-rotulo campo-rotulo--check">
+              <input type="checkbox"
+                [ngModel]="formLancamento.dividir()"
+                (ngModelChange)="formLancamento.dividir.set($event)"
+                name="dividir" />
+              <span>Dividir esta compra com alguém</span>
+            </label>
+          </div>
+
+          @if (formLancamento.dividir()) {
+            <div class="campo-linha">
+              <div class="campo-grupo" style="flex:3">
+                <label class="campo-rotulo" for="l-email">E-MAIL DO PARCEIRO</label>
+                <input id="l-email" class="campo-input" type="email"
+                  [ngModel]="formLancamento.dividirEmail()" (ngModelChange)="formLancamento.dividirEmail.set($event)"
+                  name="dividirEmail" placeholder="email@exemplo.com" />
+              </div>
+              <div class="campo-grupo">
+                <label class="campo-rotulo" for="l-pct">PARTE DELE (%)</label>
+                <input id="l-pct" class="campo-input" type="number" min="1" max="99"
+                  [ngModel]="formLancamento.dividirPct()" (ngModelChange)="formLancamento.dividirPct.set($event)"
+                  name="dividirPct" placeholder="50" />
+              </div>
+            </div>
+          }
+
+          @if (erroFormLanc()) {
+            <div class="form-erro">{{ erroFormLanc() }}</div>
+          }
+
+          <div class="form-acoes">
+            <button type="submit" class="botao-primario" [disabled]="carregandoFormLanc()">
+              @if (carregandoFormLanc()) { SALVANDO... }
+              @else { {{ lancamentoEmEdicao() ? 'SALVAR' : 'REGISTRAR' }} }
+            </button>
+            <button type="button" class="botao-cancelar" (click)="fecharFormLancamento()">CANCELAR</button>
+          </div>
+
+        </form>
+      }
+
+    </div>
+  </div>
+}
+
+<!-- ─── Modal de cartão ──────────────────────────────────────────────────────── -->
+@if (mostrarFormCartao()) {
+  <div class="overlay" (click)="fecharFormCartao()" role="dialog" aria-modal="true">
+    <div class="modal-form" (click)="$event.stopPropagation()">
+
+      <div class="modal-cabecalho">
+        <h2 class="modal-titulo">{{ cartaoEmEdicao() ? 'Editar cartão' : 'Novo cartão' }}</h2>
+        <button class="botao-fechar" type="button" (click)="fecharFormCartao()">✕</button>
+      </div>
+
+      @if (sucessoFormCart()) {
+        <div class="form-sucesso">
+          ✓ Cartão {{ cartaoEmEdicao() ? 'atualizado' : 'cadastrado' }} com sucesso!
+        </div>
+      } @else {
+        <form class="formulario" (ngSubmit)="salvarCartao()">
+
+          <div class="campo-grupo">
+            <label class="campo-rotulo" for="c-banco">BANCO / NOME DO CARTÃO</label>
+            <input id="c-banco" class="campo-input" type="text"
+              [ngModel]="formCartao.banco()" (ngModelChange)="formCartao.banco.set($event)"
+              name="banco" placeholder="Ex: Nubank, Itaú Platinum, Bradesco Visa..." autocomplete="off" />
+          </div>
+
+          <div class="campo-linha">
+            <div class="campo-grupo">
+              <label class="campo-rotulo" for="c-limite">LIMITE (R$)</label>
+              <input id="c-limite" class="campo-input" type="text" inputmode="decimal"
+                [ngModel]="formCartao.limite()" (ngModelChange)="formCartao.limite.set($event)"
+                name="limite" placeholder="0,00" />
+            </div>
+          </div>
+
+          <div class="campo-linha">
+            <div class="campo-grupo">
+              <label class="campo-rotulo" for="c-fechamento">DIA DE FECHAMENTO</label>
+              <input id="c-fechamento" class="campo-input" type="number" min="1" max="31"
+                [ngModel]="formCartao.fechamento()" (ngModelChange)="formCartao.fechamento.set($event)"
+                name="fechamento" placeholder="10" />
+            </div>
+            <div class="campo-grupo">
+              <label class="campo-rotulo" for="c-vencimento">DIA DE VENCIMENTO</label>
+              <input id="c-vencimento" class="campo-input" type="number" min="1" max="31"
+                [ngModel]="formCartao.vencimento()" (ngModelChange)="formCartao.vencimento.set($event)"
+                name="vencimento" placeholder="20" />
+            </div>
+          </div>
+
+          @if (erroFormCart()) {
+            <div class="form-erro">{{ erroFormCart() }}</div>
+          }
+
+          <div class="form-acoes">
+            <button type="submit" class="botao-primario" [disabled]="carregandoFormCart()">
+              @if (carregandoFormCart()) { SALVANDO... }
+              @else { {{ cartaoEmEdicao() ? 'SALVAR' : 'CADASTRAR' }} }
+            </button>
+            <button type="button" class="botao-cancelar" (click)="fecharFormCartao()">CANCELAR</button>
+          </div>
+
+        </form>
+      }
+
+    </div>
+  </div>
+}

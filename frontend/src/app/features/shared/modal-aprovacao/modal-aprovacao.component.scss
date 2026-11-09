@@ -1,0 +1,344 @@
+/**
+ * Modal bloqueante de aprovação — cobre toda a tela, sem forma de fechar.
+ * Segue o DESIGN.md: Parchment card, borda Ash, raio 40px, sem sombra.
+ * Lake Blue apenas no botão primário "DE ACORDO".
+ */
+
+/* ─── Overlay ────────────────────────────────────────────────────────────── */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(36, 36, 36, 0.60); /* Off-Black semitransparente */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  backdrop-filter: blur(4px);
+}
+
+/* ─── Card do modal ──────────────────────────────────────────────────────── */
+
+.modal {
+  width: 100%;
+  max-width: 480px;
+  background: var(--color-parchment);
+  border: 1px solid var(--color-ash);
+  border-radius: 40px;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  animation: entrar 0.2s ease;
+}
+
+@keyframes entrar {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ─── Cabeçalho ──────────────────────────────────────────────────────────── */
+
+.modal-cabecalho {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.modal-titulo {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  font-weight: 400;
+  letter-spacing: -0.48px;
+  color: var(--color-off-black);
+  margin: 0;
+}
+
+.modal-progresso {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-smoke);
+  white-space: nowrap;
+}
+
+/* ─── Corpo ──────────────────────────────────────────────────────────────── */
+
+.modal-corpo {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.criador-label {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--color-graphite);
+  letter-spacing: -0.28px;
+  margin: 0;
+}
+
+.criador-nome {
+  font-weight: 500;
+  color: var(--color-off-black);
+}
+
+/* ─── Dados da despesa ───────────────────────────────────────────────────── */
+
+.despesa-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.despesa-descricao {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: -0.4px;
+  color: var(--color-off-black);
+  margin: 0;
+}
+
+.despesa-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Badge genérico — pill pequeno */
+.badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 100px;
+  background: var(--color-parchment);
+  border: 1px solid var(--color-ash);
+  color: var(--color-graphite);
+
+  &--recorrente { background: rgba(167, 252, 205, 0.25); border-color: var(--color-mint); color: var(--color-off-black); }
+  &--pago       { background: rgba(167, 252, 205, 0.20); border-color: var(--color-mint); }
+  &--pendente   { background: rgba(236, 218, 152, 0.25); border-color: var(--color-gold); }
+}
+
+.despesa-data {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--color-smoke);
+  margin: 0;
+  letter-spacing: -0.28px;
+}
+
+/* ─── Destaque de valores ────────────────────────────────────────────────── */
+
+.valores {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--color-periwinkle-mist);
+  border-radius: 20px;
+  padding: 20px 24px;
+}
+
+.valor-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.valor-rotulo {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-smoke);
+}
+
+.valor-numero {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: -0.44px;
+  color: var(--color-off-black);
+}
+
+.valor-separador {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  color: var(--color-ash);
+}
+
+/* Minha parte — em destaque (maior) */
+.valor-item--destaque { flex: 1.2; }
+
+.valor-numero--destaque {
+  font-size: 28px;
+  letter-spacing: -0.56px;
+}
+
+/* ─── Comprovante ────────────────────────────────────────────────────────── */
+
+.link-comprovante {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-lake-blue);
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+
+  &:hover { opacity: 0.75; }
+}
+
+/* ─── Aviso para recorrentes ─────────────────────────────────────────────── */
+
+.aviso-recorrente {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-smoke);
+  letter-spacing: -0.28px;
+  background: rgba(236, 218, 152, 0.15);
+  border: 1px solid var(--color-gold);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin: 0;
+}
+
+/* ─── Erro da API ────────────────────────────────────────────────────────── */
+
+.erro-api {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--color-coral);
+  background: rgba(255, 148, 115, 0.08);
+  border: 1px solid var(--color-coral);
+  border-radius: 12px;
+  padding: 10px 14px;
+  text-align: center;
+}
+
+/* ─── Ações ──────────────────────────────────────────────────────────────── */
+
+.acoes {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Botão primário — Lake Blue (DE ACORDO) */
+.botao-primario {
+  flex: 1;
+  height: 48px;
+  background: var(--color-lake-blue);
+  color: #fff;
+  border: none;
+  border-radius: 100px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+  min-width: 140px;
+
+  &:hover:not(:disabled) { opacity: 0.88; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* Variante vermelha para confirmar recusa */
+  &--negar {
+    background: var(--color-off-black);
+  }
+}
+
+/* Botão de negar — ghost pill */
+.botao-negar {
+  height: 48px;
+  background: none;
+  border: 1px solid var(--color-ash);
+  border-radius: 100px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-off-black);
+  cursor: pointer;
+  padding: 0 24px;
+  transition: border-color 0.15s ease;
+
+  &:hover:not(:disabled) { border-color: var(--color-off-black); }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.botao-cancelar {
+  height: 48px;
+  background: none;
+  border: 1px solid var(--color-ash);
+  border-radius: 100px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-smoke);
+  cursor: pointer;
+  padding: 0 20px;
+  transition: border-color 0.15s ease;
+
+  &:hover:not(:disabled) { border-color: var(--color-graphite); color: var(--color-off-black); }
+}
+
+/* ─── Seção de negação ───────────────────────────────────────────────────── */
+
+.secao-negar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rotulo-justificativa {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-graphite);
+}
+
+.campo-justificativa {
+  width: 100%;
+  padding: 14px 18px;
+  background: var(--color-parchment);
+  border: 1px solid var(--color-ash);
+  border-radius: 20px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--color-off-black);
+  resize: none;
+  outline: none;
+  letter-spacing: -0.28px;
+  line-height: 1.5;
+  transition: border-color 0.15s ease;
+  box-sizing: border-box;
+
+  &:focus { border-color: var(--color-off-black); }
+  &::placeholder { color: var(--color-ash); }
+}
+
+/* ─── Mobile ─────────────────────────────────────────────────────────────── */
+
+@media (max-width: 520px) {
+  .modal { padding: 28px 24px; border-radius: 32px; }
+  .valores { flex-direction: column; gap: 12px; }
+  .valor-separador { display: none; }
+  .acoes { flex-direction: column; }
+  .botao-primario, .botao-negar { width: 100%; }
+}

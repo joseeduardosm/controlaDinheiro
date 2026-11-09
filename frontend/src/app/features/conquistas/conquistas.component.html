@@ -1,0 +1,315 @@
+<!-- Página de conquistas — metas de poupança -->
+<div class="conquistas">
+
+  <!-- ─── Cabeçalho ──────────────────────────────────────────────────────── -->
+  <div class="pagina-cabecalho">
+    <div>
+      <h1 class="pagina-titulo">Conquistas</h1>
+      <p class="pagina-subtitulo">Suas metas de poupança e objetivos financeiros</p>
+    </div>
+    <button class="botao-novo" type="button" (click)="abrirNovaConquista()">
+      NOVO OBJETIVO ▸
+    </button>
+  </div>
+
+  <!-- ─── Resumo geral ───────────────────────────────────────────────────── -->
+  @if (!carregando() && conquistas().length > 0) {
+    <div class="resumo-geral">
+      <div class="resumo-item">
+        <span class="resumo-rotulo">ACUMULADO</span>
+        <span class="resumo-valor">{{ moeda(totalAcumulado()) }}</span>
+      </div>
+      <div class="resumo-sep" aria-hidden="true">de</div>
+      <div class="resumo-item">
+        <span class="resumo-rotulo">TOTAL DAS METAS</span>
+        <span class="resumo-valor resumo-valor--meta">{{ moeda(totalMeta()) }}</span>
+      </div>
+      <div class="resumo-barra-wrapper">
+        <div class="resumo-barra-fill"
+          [style.width.%]="progressoTotal()">
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ─── Estados ───────────────────────────────────────────────────────── -->
+  @if (carregando()) {
+    <div class="estado-carregando">carregando conquistas...</div>
+  } @else if (erroLista()) {
+    <div class="estado-erro">{{ erroLista() }}</div>
+  } @else if (conquistas().length === 0) {
+    <div class="estado-vazio">
+      <div class="vazio-icone" aria-hidden="true">◎</div>
+      <p class="vazio-texto">Nenhum objetivo definido ainda</p>
+      <span class="vazio-dica">Crie sua primeira meta — viagem, reserva, compra ou qualquer sonho.</span>
+      <button class="botao-vazio" type="button" (click)="abrirNovaConquista()">Criar primeiro objetivo</button>
+    </div>
+  }
+
+  <!-- ─── Grid de cards ─────────────────────────────────────────────────── -->
+  @if (!carregando() && conquistas().length > 0) {
+    <div class="grade-conquistas">
+
+      @for (c of conquistasOrdenadas(); track c.id) {
+
+        <!-- Confirmação de remoção (sobrepõe o card) -->
+        @if (idParaRemover() === c.id) {
+          <div class="card-conquista card-conquista--removendo">
+            <p class="remocao-texto">Remover "{{ c.nome }}" e todos os aportes?</p>
+            <div class="remocao-acoes">
+              <button class="btn-confirmar-remocao" type="button" (click)="remover()" [disabled]="removendo()">
+                @if (removendo()) { REMOVENDO... } @else { REMOVER }
+              </button>
+              <button class="btn-cancelar-remocao" type="button" (click)="cancelarRemocao()">CANCELAR</button>
+            </div>
+          </div>
+        }
+
+        <!-- Card normal -->
+        @if (idParaRemover() !== c.id) {
+          <div class="card-conquista" [style.background]="fundoCard(c)" (click)="abrirDetalhe(c)" role="button" tabindex="0">
+
+            <!-- Topo: emoji + nome + botões de ação -->
+            <div class="card-topo">
+              @if (c.emoji) {
+                <span class="card-emoji" aria-hidden="true">{{ c.emoji }}</span>
+              }
+              <div class="card-info">
+                <h3 class="card-nome">{{ c.nome }}</h3>
+                @if (c.descricao) {
+                  <p class="card-descricao">{{ c.descricao }}</p>
+                }
+              </div>
+              <div class="card-acoes">
+                <button class="btn-card-acao btn-editar" type="button"
+                  (click)="$event.stopPropagation(); abrirEdicaoConquista(c)" title="Editar">✎</button>
+                <button class="btn-card-acao btn-remover" type="button"
+                  (click)="confirmarRemocao(c.id, $event)" title="Remover">✕</button>
+              </div>
+            </div>
+
+            <!-- Barra de progresso -->
+            <div class="barra-wrapper">
+              <div class="barra-fill" [style.width.%]="progresso(c)" [style.background]="corBarra(c)"></div>
+            </div>
+
+            <!-- Rodapé: valores + prazo -->
+            <div class="card-rodape">
+              <div class="card-valores">
+                <span class="card-acumulado">{{ moeda(c.acumulado) }}</span>
+                <span class="card-meta">de {{ moeda(c.meta) }}</span>
+              </div>
+              <div class="card-prazo-bloco">
+                <span class="card-pct" [style.color]="corBarra(c)">{{ progresso(c) }}%</span>
+                <span class="card-prazo">{{ rotuloPrazo(c) }}</span>
+              </div>
+            </div>
+
+            <!-- Faltante -->
+            @if (faltante(c) > 0) {
+              <p class="card-faltante">faltam {{ moeda(faltante(c)) }}</p>
+            } @else {
+              <p class="card-faltante card-faltante--ok">✓ Meta atingida!</p>
+            }
+
+          </div>
+        }
+
+      }
+
+    </div>
+  }
+
+</div>
+
+<!-- ─── Painel de detalhe / aportes ──────────────────────────────────────── -->
+@if (conquistaAberta(); as c) {
+  <div class="overlay" (click)="fecharDetalhe()" role="dialog" aria-modal="true">
+    <div class="painel-detalhe" (click)="$event.stopPropagation()">
+
+      <!-- Cabeçalho do painel -->
+      <div class="painel-cabecalho">
+        <div class="painel-titulo-bloco">
+          @if (c.emoji) { <span class="painel-emoji" aria-hidden="true">{{ c.emoji }}</span> }
+          <div>
+            <h2 class="painel-titulo">{{ c.nome }}</h2>
+            @if (c.descricao) { <p class="painel-desc">{{ c.descricao }}</p> }
+          </div>
+        </div>
+        <button class="botao-fechar" type="button" (click)="fecharDetalhe()" aria-label="Fechar">✕</button>
+      </div>
+
+      <!-- Resumo da meta -->
+      <div class="painel-resumo">
+        <div class="painel-valor-bloco">
+          <span class="painel-rotulo">ACUMULADO</span>
+          <span class="painel-valor">{{ moeda(c.acumulado) }}</span>
+        </div>
+        <div class="painel-separador" aria-hidden="true">→</div>
+        <div class="painel-valor-bloco">
+          <span class="painel-rotulo">META</span>
+          <span class="painel-valor painel-valor--meta">{{ moeda(c.meta) }}</span>
+        </div>
+        <div class="painel-valor-bloco painel-valor-bloco--dir">
+          <span class="painel-rotulo">PRAZO</span>
+          <span class="painel-valor painel-valor--prazo">{{ formatarData(c.prazo) }}</span>
+        </div>
+      </div>
+
+      <!-- Barra de progresso no painel -->
+      <div class="barra-wrapper barra-wrapper--painel">
+        <div class="barra-fill" [style.width.%]="progresso(c)" [style.background]="corBarra(c)"></div>
+      </div>
+      <div class="painel-pct-linha">
+        <span class="painel-pct" [style.color]="corBarra(c)">{{ progresso(c) }}%</span>
+        @if (faltante(c) > 0) {
+          <span class="painel-faltante">faltam {{ moeda(faltante(c)) }}</span>
+        } @else {
+          <span class="painel-faltante painel-faltante--ok">✓ Meta atingida!</span>
+        }
+      </div>
+
+      <!-- Formulário de novo aporte -->
+      @if (!modoAporte()) {
+        <button class="botao-aporte" type="button" (click)="iniciarAporte()">
+          + REGISTRAR APORTE
+        </button>
+      }
+
+      @if (modoAporte()) {
+        <div class="form-aporte">
+          <div class="campo-linha">
+            <div class="campo-grupo">
+              <label class="campo-rotulo" for="a-valor">VALOR (R$)</label>
+              <input id="a-valor" class="campo-input" type="text" inputmode="decimal"
+                [ngModel]="formAporte.valor()" (ngModelChange)="formAporte.valor.set($event)"
+                name="a-valor" placeholder="0,00" />
+            </div>
+            <div class="campo-grupo">
+              <label class="campo-rotulo" for="a-data">DATA</label>
+              <input id="a-data" class="campo-input" type="date"
+                [ngModel]="formAporte.data()" (ngModelChange)="formAporte.data.set($event)"
+                name="a-data" />
+            </div>
+          </div>
+          <div class="campo-grupo">
+            <label class="campo-rotulo" for="a-desc">DESCRIÇÃO (opcional)</label>
+            <input id="a-desc" class="campo-input" type="text"
+              [ngModel]="formAporte.descricao()" (ngModelChange)="formAporte.descricao.set($event)"
+              name="a-desc" placeholder="Ex: 13º salário, bônus..." />
+          </div>
+          @if (erroAporte()) {
+            <div class="form-erro">{{ erroAporte() }}</div>
+          }
+          <div class="form-acoes">
+            <button type="button" class="botao-primario" (click)="salvarAporte()" [disabled]="carregandoAporte()">
+              @if (carregandoAporte()) { SALVANDO... } @else { CONFIRMAR APORTE }
+            </button>
+            <button type="button" class="botao-cancelar" (click)="cancelarAporte()">CANCELAR</button>
+          </div>
+        </div>
+      }
+
+      <!-- Histórico de aportes -->
+      <div class="historico">
+        <h3 class="historico-titulo">Histórico de aportes</h3>
+        @if (c.aportes.length === 0) {
+          <p class="historico-vazio">Nenhum aporte registrado ainda.</p>
+        } @else {
+          <div class="lista-aportes">
+            @for (a of c.aportes.slice().reverse(); track a.id) {
+              <div class="aporte-linha">
+                <div class="aporte-info">
+                  <span class="aporte-valor">{{ moeda(a.valor) }}</span>
+                  @if (a.descricao) { <span class="aporte-desc">{{ a.descricao }}</span> }
+                </div>
+                <div class="aporte-dir">
+                  <span class="aporte-data">{{ formatarDataCurta(a.data) }}</span>
+                  <button class="btn-remover-aporte" type="button"
+                    (click)="removerAporte(a)" title="Remover aporte">✕</button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+    </div>
+  </div>
+}
+
+<!-- ─── Modal de formulário da conquista ─────────────────────────────────── -->
+@if (mostrarFormConquista()) {
+  <div class="overlay overlay--form" (click)="fecharFormConquista()" role="dialog" aria-modal="true">
+    <div class="modal-form" (click)="$event.stopPropagation()">
+
+      <div class="modal-cabecalho">
+        <h2 class="modal-titulo">{{ conquistaEmEdicao() ? 'Editar objetivo' : 'Novo objetivo' }}</h2>
+        <button class="botao-fechar" type="button" (click)="fecharFormConquista()" aria-label="Fechar">✕</button>
+      </div>
+
+      @if (sucessoForm()) {
+        <div class="form-sucesso">
+          ✓ Objetivo {{ conquistaEmEdicao() ? 'atualizado' : 'criado' }} com sucesso!
+        </div>
+      } @else {
+        <form class="formulario" (ngSubmit)="salvarConquista()">
+
+          <!-- Emoji + Nome na mesma linha -->
+          <div class="campo-linha">
+            <div class="campo-grupo campo-grupo--emoji">
+              <label class="campo-rotulo" for="f-emoji">EMOJI</label>
+              <input id="f-emoji" class="campo-input campo-input--emoji" type="text"
+                [ngModel]="formConquista.emoji()" (ngModelChange)="formConquista.emoji.set($event)"
+                name="emoji" placeholder="✈️" maxlength="2" />
+            </div>
+            <div class="campo-grupo" style="flex:3">
+              <label class="campo-rotulo" for="f-nome">NOME DO OBJETIVO</label>
+              <input id="f-nome" class="campo-input" type="text"
+                [ngModel]="formConquista.nome()" (ngModelChange)="formConquista.nome.set($event)"
+                name="nome" placeholder="Ex: Viagem Europa, Moto nova..." autocomplete="off" />
+            </div>
+          </div>
+
+          <!-- Descrição -->
+          <div class="campo-grupo">
+            <label class="campo-rotulo" for="f-desc">DESCRIÇÃO (opcional)</label>
+            <input id="f-desc" class="campo-input" type="text"
+              [ngModel]="formConquista.descricao()" (ngModelChange)="formConquista.descricao.set($event)"
+              name="descricao" placeholder="Detalhes do objetivo..." autocomplete="off" />
+          </div>
+
+          <!-- Meta + Prazo -->
+          <div class="campo-linha">
+            <div class="campo-grupo">
+              <label class="campo-rotulo" for="f-meta">META (R$)</label>
+              <input id="f-meta" class="campo-input" type="text" inputmode="decimal"
+                [ngModel]="formConquista.meta()" (ngModelChange)="formConquista.meta.set($event)"
+                name="meta" placeholder="0,00" />
+            </div>
+            <div class="campo-grupo">
+              <label class="campo-rotulo" for="f-prazo">PRAZO</label>
+              <input id="f-prazo" class="campo-input" type="date"
+                [ngModel]="formConquista.prazo()" (ngModelChange)="formConquista.prazo.set($event)"
+                name="prazo" />
+            </div>
+          </div>
+
+          @if (erroForm()) {
+            <div class="form-erro">{{ erroForm() }}</div>
+          }
+
+          <div class="form-acoes">
+            <button type="submit" class="botao-primario" [disabled]="carregandoForm()">
+              @if (carregandoForm()) { SALVANDO... }
+              @else { {{ conquistaEmEdicao() ? 'SALVAR ALTERAÇÕES' : 'CRIAR OBJETIVO' }} }
+            </button>
+            <button type="button" class="botao-cancelar" (click)="fecharFormConquista()">CANCELAR</button>
+          </div>
+
+        </form>
+      }
+
+    </div>
+  </div>
+}

@@ -1,0 +1,554 @@
+/**
+ * CasalComponent — estilos da página de despesas compartilhadas.
+ * Segue DESIGN.md: Parchment bg, Lake Blue CTA, raio 40px cards, sem sombras.
+ */
+
+/* ─── Layout da página ───────────────────────────────────────────────────── */
+
+.casal {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* ─── Cabeçalho ──────────────────────────────────────────────────────────── */
+
+.pagina-cabecalho {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.pagina-titulo {
+  font-family: var(--font-serif);
+  font-size: 36px;
+  font-weight: 400;
+  letter-spacing: -0.72px;
+  color: var(--color-off-black);
+  margin: 0;
+}
+
+.pagina-subtitulo {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--color-smoke);
+  letter-spacing: -0.26px;
+  margin: 6px 0 0;
+}
+
+.botao-novo {
+  height: 48px;
+  background: var(--color-lake-blue);
+  color: #fff;
+  border: none;
+  border-radius: 100px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0 28px;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+  white-space: nowrap;
+
+  &:hover { opacity: 0.88; }
+}
+
+/* ─── Navegador de mês ───────────────────────────────────────────────────── */
+
+.mes-nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.mes-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 1px solid var(--color-ash);
+  border-radius: 100px;
+  font-size: 20px;
+  color: var(--color-graphite);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+
+  &:hover { border-color: var(--color-off-black); color: var(--color-off-black); }
+}
+
+.mes-rotulo {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: -0.4px;
+  color: var(--color-off-black);
+  min-width: 180px;
+  text-align: center;
+}
+
+/* ─── Cards de balanço ───────────────────────────────────────────────────── */
+
+.balanco-secao {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.balanco-card {
+  flex: 1;
+  min-width: 240px;
+  background: var(--color-periwinkle-mist);
+  border: 1px solid var(--color-ash);
+  border-radius: 40px;
+  padding: 32px 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  cursor: default;
+
+  /* Saldo positivo (te devem) → mantém Periwinkle Mist padrão */
+  &--negativo {
+    /* Saldo negativo (você deve) → fundo Coral suave */
+    background: rgba(255, 148, 115, 0.12);
+    border-color: var(--color-coral);
+  }
+}
+
+.balanco-parceiro {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-smoke);
+}
+
+.balanco-saldo {
+  font-family: var(--font-serif);
+  font-size: 36px;
+  font-weight: 400;
+  letter-spacing: -0.72px;
+  color: var(--color-off-black);
+  margin: 4px 0;
+}
+
+.balanco-descricao {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--color-graphite);
+  letter-spacing: -0.26px;
+}
+
+.balanco-detalhes {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+
+  span {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-smoke);
+    letter-spacing: 0.02em;
+  }
+}
+
+/* ─── Seção de tabela ────────────────────────────────────────────────────── */
+
+.tabela-secao {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.secao-titulo {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  font-weight: 400;
+  letter-spacing: -0.48px;
+  color: var(--color-off-black);
+  margin: 0;
+}
+
+/* ─── Tabela ─────────────────────────────────────────────────────────────── */
+
+.tabela-wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--color-ash);
+  border-radius: 20px;
+}
+
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.th-ordenavel {
+  padding: 16px 20px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-smoke);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition: color 0.15s;
+  border-bottom: 1px solid var(--color-ash);
+
+  &:hover { color: var(--color-off-black); }
+  &.th-num { text-align: right; }
+}
+
+.tabela-linha {
+  transition: background 0.1s;
+
+  &:hover { background: rgba(0,0,0,0.02); }
+
+  td {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--color-ash);
+    color: var(--color-graphite);
+    vertical-align: middle;
+  }
+
+  &:last-child td { border-bottom: none; }
+}
+
+.td-data {
+  white-space: nowrap;
+  font-size: 12px;
+  color: var(--color-smoke);
+}
+
+.td-desc {
+  .desc-texto {
+    display: block;
+    color: var(--color-off-black);
+    margin-bottom: 4px;
+  }
+}
+
+.td-num { text-align: right; }
+
+.td-destaque {
+  color: var(--color-off-black) !important;
+  font-weight: 500;
+}
+
+/* ─── Badges ─────────────────────────────────────────────────────────────── */
+
+.badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 100px;
+  background: var(--color-parchment);
+  border: 1px solid var(--color-ash);
+  color: var(--color-graphite);
+
+  &--recorrente  { background: rgba(167,252,205,0.25); border-color: var(--color-mint); color: var(--color-off-black); }
+  &--pago        { background: rgba(167,252,205,0.20); border-color: var(--color-mint); }
+  &--pendente    { background: rgba(236,218,152,0.25); border-color: var(--color-gold); }
+  &--de-acordo   { background: rgba(167,252,205,0.20); border-color: var(--color-mint); color: var(--color-off-black); }
+  &--aguardando  { background: rgba(236,218,152,0.25); border-color: var(--color-gold); }
+  &--negado      { background: rgba(255,148,115,0.15); border-color: var(--color-coral); }
+}
+
+/* ─── Estados vazios/carregando ──────────────────────────────────────────── */
+
+.estado-carregando {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--color-smoke);
+  letter-spacing: 0.04em;
+  padding: 20px 0;
+}
+
+.estado-vazio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 60px 24px;
+  border: 1px dashed var(--color-ash);
+  border-radius: 20px;
+  text-align: center;
+
+  p {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--color-smoke);
+    margin: 0;
+  }
+}
+
+.botao-vazio {
+  height: 44px;
+  background: none;
+  border: 1px solid var(--color-ash);
+  border-radius: 100px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--color-graphite);
+  padding: 0 24px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+
+  &:hover { border-color: var(--color-off-black); color: var(--color-off-black); }
+}
+
+/* ─── Overlay do formulário ──────────────────────────────────────────────── */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  background: rgba(36,36,36,0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+/* ─── Modal do formulário ────────────────────────────────────────────────── */
+
+.modal-form {
+  width: 100%;
+  max-width: 520px;
+  background: var(--color-parchment);
+  border: 1px solid var(--color-ash);
+  border-radius: 40px;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  animation: entrar 0.2s ease;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+@keyframes entrar {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-form-cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-form-titulo {
+  font-family: var(--font-serif);
+  font-size: 28px;
+  font-weight: 400;
+  letter-spacing: -0.56px;
+  color: var(--color-off-black);
+  margin: 0;
+}
+
+.botao-fechar {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 1px solid var(--color-ash);
+  border-radius: 100px;
+  color: var(--color-graphite);
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover { border-color: var(--color-off-black); color: var(--color-off-black); }
+}
+
+/* ─── Formulário ─────────────────────────────────────────────────────────── */
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.campo-linha {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.campo-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.campo-rotulo {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-graphite);
+}
+
+.campo-input {
+  height: 48px;
+  padding: 0 18px;
+  background: var(--color-parchment);
+  border: 1px solid var(--color-ash);
+  border-radius: 20px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--color-off-black);
+  outline: none;
+  letter-spacing: -0.28px;
+  transition: border-color 0.15s;
+  width: 100%;
+  box-sizing: border-box;
+
+  &:focus { border-color: var(--color-off-black); }
+  &::placeholder { color: var(--color-ash); }
+}
+
+.campo-select {
+  appearance: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 36px;
+}
+
+.campo-dica {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-smoke);
+  letter-spacing: 0.02em;
+}
+
+/* Toggle "Dividir despesa" */
+.campo-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.toggle-check {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--color-lake-blue);
+}
+
+.toggle-rotulo {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--color-graphite);
+  cursor: pointer;
+  letter-spacing: -0.28px;
+}
+
+.campo-divisao {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 24px;
+  background: var(--color-periwinkle-mist);
+  border-radius: 20px;
+}
+
+/* ─── Feedback do formulário ─────────────────────────────────────────────── */
+
+.form-erro {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--color-coral);
+  background: rgba(255,148,115,0.08);
+  border: 1px solid var(--color-coral);
+  border-radius: 12px;
+  padding: 10px 14px;
+  text-align: center;
+}
+
+.form-sucesso {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  color: var(--color-off-black);
+  background: rgba(167,252,205,0.25);
+  border: 1px solid var(--color-mint);
+  border-radius: 20px;
+  padding: 20px 24px;
+  text-align: center;
+}
+
+.form-acoes {
+  display: flex;
+  gap: 12px;
+}
+
+.botao-primario {
+  flex: 1;
+  height: 48px;
+  background: var(--color-lake-blue);
+  color: #fff;
+  border: none;
+  border-radius: 100px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity 0.15s;
+
+  &:hover:not(:disabled) { opacity: 0.88; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.botao-cancelar {
+  height: 48px;
+  background: none;
+  border: 1px solid var(--color-ash);
+  border-radius: 100px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-smoke);
+  cursor: pointer;
+  padding: 0 24px;
+  transition: border-color 0.15s, color 0.15s;
+
+  &:hover { border-color: var(--color-graphite); color: var(--color-off-black); }
+}
+
+/* ─── Mobile ─────────────────────────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  .casal { padding: 24px 16px 60px; gap: 28px; }
+  .pagina-titulo { font-size: 28px; }
+  .pagina-cabecalho { flex-direction: column; align-items: flex-start; }
+  .balanco-saldo { font-size: 28px; }
+  .campo-linha { grid-template-columns: 1fr; }
+  .modal-form { padding: 28px 24px; border-radius: 32px; }
+  .form-acoes { flex-direction: column; }
+}

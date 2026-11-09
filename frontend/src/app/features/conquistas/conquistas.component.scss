@@ -1,0 +1,621 @@
+/**
+ * ConquistasComponent — estilos da página de metas de poupança.
+ */
+
+/* ─── Layout ─────────────────────────────────────────────────────────────── */
+
+.conquistas {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+/* ─── Cabeçalho ──────────────────────────────────────────────────────────── */
+
+.pagina-cabecalho {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.pagina-titulo {
+  font-family: var(--font-serif);
+  font-size: 36px;
+  font-weight: 400;
+  letter-spacing: -0.72px;
+  color: var(--color-off-black);
+  margin: 0;
+}
+
+.pagina-subtitulo {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--color-smoke);
+  letter-spacing: -0.26px;
+  margin: 6px 0 0;
+}
+
+.botao-novo {
+  height: 48px;
+  background: var(--color-lake-blue);
+  color: #fff;
+  border: none;
+  border-radius: 100px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0 28px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  white-space: nowrap;
+  &:hover { opacity: 0.88; }
+}
+
+/* ─── Resumo geral ───────────────────────────────────────────────────────── */
+
+.resumo-geral {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 24px 32px;
+  background: var(--color-periwinkle-mist);
+  border: 1px solid var(--color-ash);
+  border-radius: 40px;
+}
+
+.resumo-item { display: flex; flex-direction: column; gap: 4px; }
+
+.resumo-rotulo {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-smoke);
+}
+
+.resumo-valor {
+  font-family: var(--font-serif);
+  font-size: 28px;
+  font-weight: 400;
+  letter-spacing: -0.56px;
+  color: var(--color-off-black);
+  &--meta { color: var(--color-smoke); font-size: 22px; }
+}
+
+.resumo-sep {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--color-smoke);
+}
+
+.resumo-barra-wrapper {
+  flex: 1;
+  min-width: 100px;
+  height: 6px;
+  background: var(--color-ash);
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+.resumo-barra-fill {
+  height: 100%;
+  background: var(--color-mint);
+  border-radius: 100px;
+  transition: width 0.4s ease;
+  min-width: 4px;
+}
+
+/* ─── Grade de cards ─────────────────────────────────────────────────────── */
+
+.grade-conquistas {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+/* ─── Card de conquista ──────────────────────────────────────────────────── */
+
+.card-conquista {
+  background: #fff;
+  border: 1px solid var(--color-ash);
+  border-radius: 40px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.12s;
+
+  &:hover {
+    border-color: var(--color-graphite);
+    transform: translateY(-2px);
+  }
+
+  &--removendo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+    cursor: default;
+    transform: none !important;
+    border-color: var(--color-coral) !important;
+    background: rgba(255, 148, 115, 0.06) !important;
+  }
+}
+
+.card-topo {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.card-emoji {
+  font-size: 28px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.card-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.card-nome {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: -0.4px;
+  color: var(--color-off-black);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-descricao {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-smoke);
+  letter-spacing: -0.22px;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-acoes {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.btn-card-acao {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 1px solid var(--color-ash);
+  border-radius: 100px;
+  font-size: 12px;
+  color: var(--color-smoke);
+  cursor: pointer;
+  transition: all 0.15s;
+  &:hover { opacity: 1; }
+}
+
+.btn-editar:hover  { border-color: var(--color-lake-blue); color: var(--color-lake-blue); }
+.btn-remover:hover { border-color: var(--color-coral); color: var(--color-coral); }
+
+/* ─── Barra de progresso ─────────────────────────────────────────────────── */
+
+.barra-wrapper {
+  height: 6px;
+  background: var(--color-ash);
+  border-radius: 100px;
+  overflow: hidden;
+
+  &--painel { height: 8px; }
+}
+
+.barra-fill {
+  height: 100%;
+  border-radius: 100px;
+  transition: width 0.4s ease;
+  min-width: 4px;
+}
+
+/* ─── Rodapé do card ─────────────────────────────────────────────────────── */
+
+.card-rodape {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.card-valores { display: flex; flex-direction: column; gap: 2px; }
+
+.card-acumulado {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: -0.44px;
+  color: var(--color-off-black);
+}
+
+.card-meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-smoke);
+  letter-spacing: -0.22px;
+}
+
+.card-prazo-bloco {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.card-pct {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.32px;
+}
+
+.card-prazo {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-smoke);
+  letter-spacing: -0.22px;
+}
+
+.card-faltante {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-smoke);
+  letter-spacing: -0.24px;
+  margin: 0;
+
+  &--ok { color: var(--color-mint); font-weight: 500; }
+}
+
+/* ─── Confirmação de remoção no card ─────────────────────────────────────── */
+
+.remocao-texto {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--color-off-black);
+  letter-spacing: -0.28px;
+  margin: 0;
+  text-align: center;
+}
+
+.remocao-acoes {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.btn-confirmar-remocao {
+  height: 36px; padding: 0 20px;
+  background: var(--color-off-black); color: #fff;
+  border: none; border-radius: 100px;
+  font-family: var(--font-mono); font-size: 12px;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  cursor: pointer; transition: opacity 0.15s;
+  &:hover:not(:disabled) { opacity: 0.8; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.btn-cancelar-remocao {
+  height: 36px; padding: 0 16px;
+  background: none; border: 1px solid var(--color-ash); border-radius: 100px;
+  font-family: var(--font-mono); font-size: 12px;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--color-smoke); cursor: pointer; transition: all 0.15s;
+  &:hover { border-color: var(--color-graphite); color: var(--color-off-black); }
+}
+
+/* ─── Estados ────────────────────────────────────────────────────────────── */
+
+.estado-carregando {
+  font-family: var(--font-mono); font-size: 13px;
+  color: var(--color-smoke); letter-spacing: 0.04em;
+}
+
+.estado-erro {
+  font-family: var(--font-mono); font-size: 13px; color: var(--color-coral);
+  padding: 16px 20px; border: 1px solid var(--color-coral); border-radius: 12px;
+  background: rgba(255,148,115,0.08);
+}
+
+.estado-vazio {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 12px; padding: 60px 24px;
+  border: 1px dashed var(--color-ash); border-radius: 40px; text-align: center;
+}
+
+.vazio-icone { font-size: 32px; color: var(--color-ash); }
+
+.vazio-texto {
+  font-family: var(--font-serif); font-size: 24px; font-weight: 400;
+  letter-spacing: -0.48px; color: var(--color-smoke); margin: 0;
+}
+
+.vazio-dica {
+  font-family: var(--font-mono); font-size: 13px;
+  color: var(--color-ash); max-width: 320px; letter-spacing: -0.26px;
+}
+
+.botao-vazio {
+  margin-top: 8px; height: 44px; background: none;
+  border: 1px solid var(--color-ash); border-radius: 100px;
+  font-family: var(--font-mono); font-size: 13px; color: var(--color-graphite);
+  padding: 0 28px; cursor: pointer; transition: all 0.15s;
+  &:hover { border-color: var(--color-off-black); color: var(--color-off-black); }
+}
+
+/* ─── Overlay + painel de detalhe ────────────────────────────────────────── */
+
+.overlay {
+  position: fixed; inset: 0; z-index: 900;
+  background: rgba(36,36,36,0.55); backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center; padding: 24px 16px;
+  &--form { z-index: 950; }
+}
+
+.painel-detalhe {
+  width: 100%; max-width: 540px;
+  background: var(--color-parchment);
+  border: 1px solid var(--color-ash);
+  border-radius: 40px; padding: 40px;
+  display: flex; flex-direction: column; gap: 24px;
+  animation: entrar 0.2s ease;
+  max-height: 90vh; overflow-y: auto;
+}
+
+@keyframes entrar {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.painel-cabecalho { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+
+.painel-titulo-bloco { display: flex; align-items: flex-start; gap: 12px; }
+
+.painel-emoji { font-size: 32px; line-height: 1; flex-shrink: 0; }
+
+.painel-titulo {
+  font-family: var(--font-serif); font-size: 24px; font-weight: 400;
+  letter-spacing: -0.48px; color: var(--color-off-black); margin: 0;
+}
+
+.painel-desc {
+  font-family: var(--font-mono); font-size: 12px; color: var(--color-smoke);
+  letter-spacing: -0.24px; margin: 4px 0 0;
+}
+
+.botao-fechar {
+  width: 36px; height: 36px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: none; border: 1px solid var(--color-ash); border-radius: 100px;
+  color: var(--color-graphite); cursor: pointer; transition: all 0.15s;
+  &:hover { border-color: var(--color-off-black); color: var(--color-off-black); }
+}
+
+.painel-resumo {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  background: var(--color-periwinkle-mist); border-radius: 20px; padding: 20px 24px;
+}
+
+.painel-valor-bloco {
+  display: flex; flex-direction: column; gap: 4px;
+  &--dir { margin-left: auto; text-align: right; }
+}
+
+.painel-rotulo {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-smoke);
+}
+
+.painel-valor {
+  font-family: var(--font-serif); font-size: 24px; font-weight: 400;
+  letter-spacing: -0.48px; color: var(--color-off-black);
+  &--meta   { color: var(--color-smoke); font-size: 18px; }
+  &--prazo  { font-family: var(--font-mono); font-size: 16px; letter-spacing: -0.32px; }
+}
+
+.painel-separador {
+  font-family: var(--font-mono); font-size: 18px; color: var(--color-ash);
+}
+
+.painel-pct-linha {
+  display: flex; justify-content: space-between; align-items: center;
+}
+
+.painel-pct {
+  font-family: var(--font-mono); font-size: 14px; font-weight: 500; letter-spacing: -0.28px;
+}
+
+.painel-faltante {
+  font-family: var(--font-mono); font-size: 12px; color: var(--color-smoke); letter-spacing: -0.24px;
+  &--ok { color: var(--color-mint); font-weight: 500; }
+}
+
+/* ─── Botão de aporte ────────────────────────────────────────────────────── */
+
+.botao-aporte {
+  height: 48px; width: 100%;
+  background: none; border: 1px dashed var(--color-ash); border-radius: 20px;
+  font-family: var(--font-mono); font-size: 13px; font-weight: 500;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--color-graphite); cursor: pointer; transition: all 0.15s;
+  &:hover { border-color: var(--color-off-black); color: var(--color-off-black); border-style: solid; }
+}
+
+/* ─── Formulário de aporte ───────────────────────────────────────────────── */
+
+.form-aporte {
+  display: flex; flex-direction: column; gap: 16px;
+  padding: 20px 24px;
+  background: rgba(0,0,0,0.02);
+  border: 1px solid var(--color-ash); border-radius: 20px;
+}
+
+.campo-linha  { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.campo-grupo  { display: flex; flex-direction: column; gap: 6px; &--emoji { flex: 0 0 80px; } }
+
+.campo-rotulo {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-graphite);
+}
+
+.campo-input {
+  height: 46px; padding: 0 16px;
+  background: var(--color-parchment); border: 1px solid var(--color-ash);
+  border-radius: 16px; font-family: var(--font-mono); font-size: 14px;
+  color: var(--color-off-black); outline: none; letter-spacing: -0.28px;
+  transition: border-color 0.15s; width: 100%; box-sizing: border-box;
+  &:focus { border-color: var(--color-off-black); }
+  &::placeholder { color: var(--color-ash); }
+  &--emoji { text-align: center; font-size: 20px; padding: 0 8px; }
+}
+
+.form-erro {
+  font-family: var(--font-mono); font-size: 13px; color: var(--color-coral);
+  background: rgba(255,148,115,0.08); border: 1px solid var(--color-coral);
+  border-radius: 12px; padding: 10px 14px; text-align: center;
+}
+
+.form-sucesso {
+  font-family: var(--font-mono); font-size: 15px; color: var(--color-off-black);
+  background: rgba(167,252,205,0.25); border: 1px solid var(--color-mint);
+  border-radius: 20px; padding: 20px 24px; text-align: center;
+}
+
+.form-acoes { display: flex; gap: 10px; }
+
+.botao-primario {
+  flex: 1; height: 44px;
+  background: var(--color-lake-blue); color: #fff;
+  border: none; border-radius: 100px;
+  font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+  letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer;
+  transition: opacity 0.15s;
+  &:hover:not(:disabled) { opacity: 0.88; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.botao-cancelar {
+  height: 44px; background: none; border: 1px solid var(--color-ash);
+  border-radius: 100px; font-family: var(--font-mono); font-size: 12px;
+  letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-smoke);
+  cursor: pointer; padding: 0 20px; transition: all 0.15s;
+  &:hover { border-color: var(--color-graphite); color: var(--color-off-black); }
+}
+
+/* ─── Histórico de aportes ───────────────────────────────────────────────── */
+
+.historico { display: flex; flex-direction: column; gap: 12px; }
+
+.historico-titulo {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-smoke);
+  margin: 0;
+}
+
+.historico-vazio {
+  font-family: var(--font-mono); font-size: 13px; color: var(--color-ash);
+  letter-spacing: -0.26px; margin: 0;
+}
+
+.lista-aportes {
+  display: flex; flex-direction: column;
+  border: 1px solid var(--color-ash); border-radius: 16px; overflow: hidden;
+}
+
+.aporte-linha {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-ash);
+  &:last-child { border-bottom: none; }
+}
+
+.aporte-info { display: flex; flex-direction: column; gap: 2px; }
+
+.aporte-valor {
+  font-family: var(--font-mono); font-size: 14px; font-weight: 500;
+  color: var(--color-off-black); letter-spacing: -0.28px;
+}
+
+.aporte-desc {
+  font-family: var(--font-mono); font-size: 11px; color: var(--color-smoke); letter-spacing: -0.22px;
+}
+
+.aporte-dir {
+  display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+}
+
+.aporte-data {
+  font-family: var(--font-mono); font-size: 12px; color: var(--color-smoke);
+}
+
+.btn-remover-aporte {
+  width: 24px; height: 24px;
+  display: flex; align-items: center; justify-content: center;
+  background: none; border: 1px solid var(--color-ash); border-radius: 100px;
+  font-size: 11px; color: var(--color-smoke); cursor: pointer; transition: all 0.15s;
+  &:hover { border-color: var(--color-coral); color: var(--color-coral); }
+}
+
+/* ─── Modal de formulário ────────────────────────────────────────────────── */
+
+.modal-form {
+  width: 100%; max-width: 480px;
+  background: var(--color-parchment); border: 1px solid var(--color-ash);
+  border-radius: 40px; padding: 40px;
+  display: flex; flex-direction: column; gap: 24px;
+  animation: entrar 0.2s ease;
+}
+
+.modal-cabecalho { display: flex; align-items: center; justify-content: space-between; }
+
+.modal-titulo {
+  font-family: var(--font-serif); font-size: 28px; font-weight: 400;
+  letter-spacing: -0.56px; color: var(--color-off-black); margin: 0;
+}
+
+.formulario { display: flex; flex-direction: column; gap: 18px; }
+
+/* ─── Mobile ─────────────────────────────────────────────────────────────── */
+
+@media (max-width: 900px) {
+  .grade-conquistas { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .conquistas { padding: 24px 16px 60px; gap: 24px; }
+  .pagina-titulo { font-size: 28px; }
+  .pagina-cabecalho { flex-direction: column; align-items: flex-start; }
+  .grade-conquistas { grid-template-columns: 1fr; }
+  .resumo-geral { flex-direction: column; align-items: flex-start; }
+  .painel-detalhe { padding: 28px 24px; border-radius: 32px; }
+  .modal-form { padding: 28px 24px; border-radius: 32px; }
+  .campo-linha { grid-template-columns: 1fr; }
+  .form-acoes { flex-direction: column; }
+}

@@ -1,0 +1,592 @@
+/**
+ * Dashboard home — layout e componentes visuais seguindo o DESIGN.md (Monad).
+ * Cards com borda Ash, raio 40px, sem sombra. Tile de saldo em Periwinkle Mist.
+ */
+
+/* ─── Página ─────────────────────────────────────────────────────────────── */
+
+.pagina {
+  background: var(--color-parchment);
+  min-height: calc(100vh - 80px); /* desconta a topbar */
+  padding: 48px 40px 80px;
+}
+
+.interior {
+  max-width: 1432px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+/* ─── Saudação + navegador ───────────────────────────────────────────────── */
+
+.saudacao {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.mes-nav { display: flex; align-items: center; gap: 16px; }
+
+.mes-btn {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  background: none;
+  border: 1px solid var(--color-ash);
+  border-radius: 100px;
+  font-size: 20px;
+  color: var(--color-graphite);
+  cursor: pointer;
+  transition: all 0.15s;
+  &:hover { border-color: var(--color-off-black); color: var(--color-off-black); }
+}
+
+.mes-rotulo {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--color-smoke);
+  letter-spacing: -0.26px;
+  min-width: 140px;
+  text-align: center;
+}
+
+.saudacao-titulo {
+  font-family: var(--font-serif);
+  font-size: 48px;
+  font-weight: 400;
+  letter-spacing: -0.96px;
+  color: var(--color-off-black);
+  margin: 0;
+}
+
+.saudacao-data {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--color-smoke);
+  letter-spacing: -0.28px;
+  margin: 0;
+  text-transform: capitalize;
+}
+
+/* ─── Tiles de resumo ────────────────────────────────────────────────────── */
+
+.grade-tiles {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+/* Card base dos tiles — reset de <a> + estilos visuais */
+.tile {
+  background: #fff;
+  border: 1px solid var(--color-ash);
+  border-radius: 40px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-decoration: none;         /* remove sublinhado do <a> */
+  color: inherit;                /* herda cor do texto */
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+
+  &:hover {
+    border-color: var(--color-graphite); /* feedback de hover sutil */
+
+    .tile-seta { opacity: 1; transform: translateX(2px); }
+  }
+}
+
+/* Tile em destaque: Periwinkle Mist */
+.tile--destaque {
+  background: var(--color-periwinkle-mist);
+  border-color: transparent;
+  &:hover { border-color: var(--color-sky-blue); }
+}
+
+/* Tile de saldo negativo: Coral */
+.tile--negativo {
+  background: rgba(255, 148, 115, 0.14) !important;
+  &:hover { border-color: var(--color-coral) !important; }
+}
+
+.tile-variacao--ok { color: var(--color-mint); }
+
+.tile-rotulo {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-smoke);
+}
+
+.tile-valor {
+  font-family: var(--font-serif);
+  font-size: 32px;
+  font-weight: 400;
+  letter-spacing: -0.64px;
+  color: var(--color-off-black);
+  line-height: 1;
+}
+
+.tile-variacao {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-smoke);
+  letter-spacing: -0.3px;
+}
+
+/* Seta de navegação — aparece ao hover */
+.tile-seta {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--color-smoke);
+  margin-top: auto;
+  opacity: 0;
+  transform: translateX(0);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+/* ─── Seção genérica ─────────────────────────────────────────────────────── */
+
+.secao {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.secao-cabecalho {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.secao-titulo {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  font-weight: 400;
+  letter-spacing: -0.48px;
+  color: var(--color-off-black);
+  margin: 0;
+}
+
+/* Text Link do DESIGN.md */
+.link-todos {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-smoke);
+  text-decoration: none;
+  transition: color 0.15s ease;
+
+  &:hover { color: var(--color-off-black); }
+}
+
+/* ─── Skeleton de carregamento ───────────────────────────────────────────── */
+
+.estado-carregando { display: flex; flex-direction: column; gap: 20px; }
+
+.carregando-grade {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.skeleton {
+  height: 160px;
+  background: linear-gradient(90deg, var(--color-ash) 25%, rgba(206,202,200,0.4) 50%, var(--color-ash) 75%);
+  background-size: 200% 100%;
+  border-radius: 40px;
+  animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+/* ─── Cards do casal ─────────────────────────────────────────────────────── */
+
+.grade-casal { display: flex; gap: 16px; flex-wrap: wrap; }
+
+.card-casal {
+  flex: 1;
+  min-width: 200px;
+  border: 1px solid var(--color-ash);
+  border-radius: 40px;
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  &:hover { border-color: var(--color-graphite); .tile-seta { opacity: 1; } }
+}
+
+.casal-parceiro {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-smoke);
+}
+
+.casal-rotulo {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--color-graphite);
+  letter-spacing: -0.26px;
+}
+
+.casal-saldo {
+  font-family: var(--font-serif);
+  font-size: 28px;
+  font-weight: 400;
+  letter-spacing: -0.56px;
+  color: var(--color-off-black);
+  margin: 4px 0;
+}
+
+/* ─── Icone de lançamento ────────────────────────────────────────────────── */
+
+.lancamento-icone {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 100px;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+  background: rgba(255, 148, 115, 0.12);
+  color: var(--color-coral);
+
+  &--receita {
+    background: rgba(167, 252, 205, 0.25);
+    color: var(--color-off-black);
+  }
+}
+
+/* ─── Lista vazia ────────────────────────────────────────────────────────── */
+
+.lista-vazia {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--color-smoke);
+  letter-spacing: -0.26px;
+  padding: 32px;
+  border: 1px dashed var(--color-ash);
+  border-radius: 20px;
+  text-align: center;
+}
+
+/* ─── Conquistas: placeholder ────────────────────────────────────────────── */
+
+.conquistas-breve {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 40px 24px;
+  border: 1px dashed var(--color-ash);
+  border-radius: 40px;
+  text-align: center;
+}
+
+.breve-icone {
+  font-size: 28px;
+  color: var(--color-ash);
+}
+
+.breve-texto {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: -0.4px;
+  color: var(--color-smoke);
+  margin: 0;
+}
+
+.breve-dica {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-ash);
+  letter-spacing: -0.24px;
+  max-width: 280px;
+}
+
+/* ─── Conquistas ─────────────────────────────────────────────────────────── */
+
+.grade-conquistas {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.conquista {
+  background: #fff;
+  border: 1px solid var(--color-ash);
+  border-radius: 40px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+
+  &:hover { border-color: var(--color-graphite); }
+}
+
+.conquista-topo {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.conquista-emoji {
+  font-size: 28px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.conquista-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.conquista-nome {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: -0.4px;
+  color: var(--color-off-black);
+  margin: 0;
+}
+
+.conquista-prazo {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-smoke);
+  letter-spacing: -0.3px;
+}
+
+/* Trilha da barra de progresso */
+.barra-wrapper {
+  height: 6px;
+  background: var(--color-ash);
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+/* Preenchimento — cor vem do componente via [style.background] */
+.barra-fill {
+  height: 100%;
+  border-radius: 100px;
+  transition: width 0.4s ease;
+  min-width: 4px; /* visível mesmo com 0% */
+}
+
+.conquista-rodape {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.conquista-pct {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-off-black);
+  letter-spacing: -0.28px;
+}
+
+.conquista-falta {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-smoke);
+  letter-spacing: -0.3px;
+}
+
+/* ─── Grade inferior ─────────────────────────────────────────────────────── */
+
+/* Lançamentos (maior) à esquerda, fatura (menor) à direita */
+.grade-inferior {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+/* ─── Lista de lançamentos ───────────────────────────────────────────────── */
+
+.lista-lancamentos {
+  background: var(--color-parchment);
+  border: 1px solid var(--color-ash);
+  border-radius: 40px;
+  overflow: hidden; /* mantém bordas arredondadas nos itens */
+}
+
+/* Cada item da lista */
+.lancamento {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 28px;
+  border-bottom: 1px solid var(--color-ash);
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: background 0.12s ease;
+
+  &:last-child { border-bottom: none; }
+
+  &:hover { background: rgba(206, 202, 200, 0.18); }
+}
+
+.lancamento-emoji {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.lancamento-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0; /* evita overflow */
+}
+
+.lancamento-descricao {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--color-off-black);
+  letter-spacing: -0.28px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lancamento-categoria {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-smoke);
+}
+
+.lancamento-direita {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+/* Valor de despesa: Graphite. Valor de receita: Off-Black em destaque */
+.lancamento-valor {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-graphite);
+  letter-spacing: -0.28px;
+
+  &--receita { color: var(--color-off-black); }
+}
+
+.lancamento-data {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-smoke);
+}
+
+/* ─── Fatura do cartão ───────────────────────────────────────────────────── */
+
+.cartao-fatura {
+  background: rgba(255, 148, 115, 0.07); /* tint coral — representa uma dívida/conta */
+  border: 1px solid var(--color-ash);
+  border-radius: 40px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+
+  &:hover { border-color: var(--color-graphite); }
+}
+
+.fatura-nome {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-smoke);
+}
+
+.fatura-valor {
+  font-family: var(--font-serif);
+  font-size: 36px;
+  font-weight: 400;
+  letter-spacing: -0.72px;
+  color: var(--color-off-black);
+  line-height: 1;
+}
+
+.fatura-datas {
+  display: flex;
+  gap: 24px;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-ash);
+}
+
+.fatura-data-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fatura-data-rotulo {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-smoke);
+}
+
+.fatura-data-valor {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--color-off-black);
+  letter-spacing: -0.28px;
+}
+
+/* ─── Responsividade ─────────────────────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+  .grade-tiles      { grid-template-columns: repeat(2, 1fr); }
+  .grade-conquistas { grid-template-columns: repeat(2, 1fr); }
+  .grade-inferior   { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+  .pagina           { padding: 32px 20px 60px; }
+  .grade-tiles      { grid-template-columns: 1fr; }
+  .grade-conquistas { grid-template-columns: 1fr; }
+  .saudacao-titulo  { font-size: 36px; }
+}

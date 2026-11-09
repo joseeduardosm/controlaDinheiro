@@ -1,0 +1,208 @@
+<!-- Página de receitas — resumo + tabela + modal -->
+<div class="receitas">
+
+  <!-- ─── Cabeçalho ─────────────────────────────────────────────────────── -->
+  <div class="pagina-cabecalho">
+    <div>
+      <h1 class="pagina-titulo">Receitas</h1>
+      <p class="pagina-subtitulo">Suas entradas de {{ rotuloPeriodo() }}</p>
+    </div>
+    <button class="botao-novo" type="button" (click)="abrirNovaReceita()">
+      NOVA RECEITA ▸
+    </button>
+  </div>
+
+  <!-- ─── Navegador de mês ───────────────────────────────────────────────── -->
+  <div class="mes-nav">
+    <button class="mes-btn" type="button" (click)="mesAnterior()" aria-label="Mês anterior">‹</button>
+    <span class="mes-rotulo">{{ rotuloPeriodo() }}</span>
+    <button class="mes-btn" type="button" (click)="proximoMes()" aria-label="Próximo mês">›</button>
+  </div>
+
+  <!-- ─── Cards de resumo ───────────────────────────────────────────────── -->
+  <div class="resumo-grid">
+
+    <div class="resumo-card resumo-card--total">
+      <span class="resumo-rotulo">TOTAL DO MÊS</span>
+      <span class="resumo-valor">{{ moeda(resumo().total) }}</span>
+      <span class="resumo-desc">{{ resumo().quantidade }} receita{{ resumo().quantidade !== 1 ? 's' : '' }}</span>
+    </div>
+
+    <div class="resumo-card resumo-card--recebido">
+      <span class="resumo-rotulo">RECEBIDO</span>
+      <span class="resumo-valor">{{ moeda(resumo().recebido) }}</span>
+      <span class="resumo-desc">já confirmado</span>
+    </div>
+
+    <div class="resumo-card resumo-card--pendente">
+      <span class="resumo-rotulo">A RECEBER</span>
+      <span class="resumo-valor">{{ moeda(resumo().pendente) }}</span>
+      <span class="resumo-desc">aguardando entrada</span>
+    </div>
+
+  </div>
+
+  <!-- ─── Filtros ───────────────────────────────────────────────────────── -->
+  <div class="filtros">
+    <button class="filtro-btn" [class.filtro-btn--ativo]="filtroSituacao() === ''" (click)="filtroSituacao.set('')" type="button">Todos</button>
+    <button class="filtro-btn" [class.filtro-btn--ativo]="filtroSituacao() === 'pendente'" (click)="filtroSituacao.set('pendente')" type="button">A receber</button>
+    <button class="filtro-btn" [class.filtro-btn--ativo]="filtroSituacao() === 'recebido'" (click)="filtroSituacao.set('recebido')" type="button">Recebido</button>
+  </div>
+
+  <!-- ─── Tabela ────────────────────────────────────────────────────────── -->
+  <section class="tabela-secao">
+
+    @if (carregando()) {
+      <div class="estado-carregando">carregando receitas...</div>
+    } @else if (erroLista()) {
+      <div class="estado-erro">{{ erroLista() }}</div>
+    } @else if (receitasFiltradas().length === 0) {
+      <div class="estado-vazio">
+        <p>Nenhuma receita em {{ rotuloPeriodo() }}</p>
+        <button class="botao-vazio" type="button" (click)="abrirNovaReceita()">Registrar primeira receita</button>
+      </div>
+    } @else {
+      <div class="tabela-wrapper">
+        <table class="tabela">
+          <thead>
+            <tr>
+              <th class="th-ord" (click)="ordenarPor('data')">DATA {{ iconeOrdem('data') }}</th>
+              <th class="th-ord" (click)="ordenarPor('descricao')">DESCRIÇÃO {{ iconeOrdem('descricao') }}</th>
+              <th class="th-ord th-num" (click)="ordenarPor('valor')">VALOR {{ iconeOrdem('valor') }}</th>
+              <th class="th-ord" (click)="ordenarPor('recorrente')">REPETIÇÃO {{ iconeOrdem('recorrente') }}</th>
+              <th class="th-ord" (click)="ordenarPor('situacao')">SITUAÇÃO {{ iconeOrdem('situacao') }}</th>
+              <th class="th-acoes">AÇÕES</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (r of receitasFiltradas(); track r.id) {
+
+              @if (idParaExcluir() !== r.id) {
+                <tr class="tabela-linha">
+                  <td class="td-data">{{ formatarData(r.data) }}</td>
+                  <td class="td-desc">
+                    <span class="desc-texto">{{ r.descricao }}</span>
+                  </td>
+                  <td class="td-num td-valor">{{ moeda(r.valor) }}</td>
+                  <td>
+                    @if (r.recorrente !== 'nao') {
+                      <span class="badge badge--recorrente">↻ {{ rotuloRecorrencia(r.recorrente) }}</span>
+                    } @else {
+                      <span class="td-muted">—</span>
+                    }
+                  </td>
+                  <td>
+                    <span class="badge" [class.badge--recebido]="r.situacao === 'recebido'" [class.badge--pendente]="r.situacao === 'pendente'">
+                      {{ r.situacao === 'recebido' ? 'Recebido' : 'A receber' }}
+                    </span>
+                  </td>
+                  <td class="td-acoes">
+                    <button class="btn-acao btn-editar" type="button" (click)="abrirEdicao(r)" title="Editar">✎</button>
+                    <button class="btn-acao btn-excluir" type="button" (click)="confirmarExclusao(r.id)" title="Excluir">✕</button>
+                  </td>
+                </tr>
+              }
+
+              @if (idParaExcluir() === r.id) {
+                <tr class="tabela-linha tabela-linha--exclusao">
+                  <td colspan="6">
+                    <div class="confirmacao-exclusao">
+                      <span class="confirmacao-texto">Excluir "{{ r.descricao }}"?</span>
+                      <button class="btn-confirmar-exclusao" type="button" (click)="excluir()" [disabled]="excluindo()">
+                        @if (excluindo()) { EXCLUINDO... } @else { EXCLUIR }
+                      </button>
+                      <button class="btn-cancelar-exclusao" type="button" (click)="cancelarExclusao()">CANCELAR</button>
+                    </div>
+                  </td>
+                </tr>
+              }
+
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+  </section>
+
+</div>
+
+<!-- ─── Modal de formulário ────────────────────────────────────────────── -->
+@if (mostrarFormulario()) {
+  <div class="overlay" (click)="fecharFormulario()" role="dialog" aria-modal="true">
+    <div class="modal-form" (click)="$event.stopPropagation()">
+
+      <div class="modal-cabecalho">
+        <h2 class="modal-titulo">{{ receitaEmEdicao() ? 'Editar receita' : 'Nova receita' }}</h2>
+        <button class="botao-fechar" type="button" (click)="fecharFormulario()" aria-label="Fechar">✕</button>
+      </div>
+
+      @if (sucessoForm()) {
+        <div class="form-sucesso">
+          ✓ Receita {{ receitaEmEdicao() ? 'atualizada' : 'criada' }} com sucesso!
+        </div>
+      } @else {
+        <form class="formulario" (ngSubmit)="salvar()">
+
+          <div class="campo-grupo">
+            <label class="campo-rotulo" for="f-desc">DESCRIÇÃO</label>
+            <input id="f-desc" class="campo-input" type="text"
+              [ngModel]="form.descricao()" (ngModelChange)="form.descricao.set($event)"
+              name="descricao" placeholder="Ex: Salário, Freela, Aluguel recebido..." autocomplete="off" />
+          </div>
+
+          <div class="campo-linha">
+            <div class="campo-grupo">
+              <label class="campo-rotulo" for="f-valor">VALOR (R$)</label>
+              <input id="f-valor" class="campo-input" type="text" inputmode="decimal"
+                [ngModel]="form.valor()" (ngModelChange)="form.valor.set($event)"
+                name="valor" placeholder="0,00" />
+            </div>
+            <div class="campo-grupo">
+              <label class="campo-rotulo" for="f-data">DATA</label>
+              <input id="f-data" class="campo-input" type="date"
+                [ngModel]="form.data()" (ngModelChange)="form.data.set($event)"
+                name="data" />
+            </div>
+          </div>
+
+          <div class="campo-linha">
+            <div class="campo-grupo">
+              <label class="campo-rotulo" for="f-rec">REPETIÇÃO</label>
+              <select id="f-rec" class="campo-input campo-select"
+                [ngModel]="form.recorrente()" (ngModelChange)="form.recorrente.set($event)"
+                name="recorrente">
+                @for (op of opcoesRecorrencia; track op[0]) {
+                  <option [value]="op[0]">{{ op[1] }}</option>
+                }
+              </select>
+            </div>
+            <div class="campo-grupo">
+              <label class="campo-rotulo" for="f-sit">SITUAÇÃO</label>
+              <select id="f-sit" class="campo-input campo-select"
+                [ngModel]="form.situacao()" (ngModelChange)="form.situacao.set($event)"
+                name="situacao">
+                <option value="pendente">A receber</option>
+                <option value="recebido">Recebido</option>
+              </select>
+            </div>
+          </div>
+
+          @if (erroForm()) {
+            <div class="form-erro">{{ erroForm() }}</div>
+          }
+
+          <div class="form-acoes">
+            <button type="submit" class="botao-primario" [disabled]="carregandoForm()">
+              @if (carregandoForm()) { SALVANDO... }
+              @else { {{ receitaEmEdicao() ? 'SALVAR ALTERAÇÕES' : 'CRIAR RECEITA' }} }
+            </button>
+            <button type="button" class="botao-cancelar" (click)="fecharFormulario()">CANCELAR</button>
+          </div>
+
+        </form>
+      }
+
+    </div>
+  </div>
+}

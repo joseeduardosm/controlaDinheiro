@@ -1,0 +1,241 @@
+<!-- Página de despesas do casal — balanço + lista + formulário -->
+<div class="casal">
+
+  <!-- ─── Cabeçalho da página ────────────────────────────────────────────── -->
+  <div class="pagina-cabecalho">
+    <div>
+      <h1 class="pagina-titulo">Casal</h1>
+      <p class="pagina-subtitulo">Despesas compartilhadas e balanço do mês</p>
+    </div>
+    <button class="botao-novo" type="button" (click)="abrirFormulario()">
+      NOVA DESPESA ▸
+    </button>
+  </div>
+
+  <!-- ─── Navegador de mês ───────────────────────────────────────────────── -->
+  <div class="mes-nav">
+    <button class="mes-btn" type="button" (click)="mesAnterior()" aria-label="Mês anterior">‹</button>
+    <span class="mes-rotulo">{{ rotuloPeriodo() }}</span>
+    <button class="mes-btn" type="button" (click)="proximoMes()" aria-label="Próximo mês">›</button>
+  </div>
+
+  <!-- ─── Cards de balanço ──────────────────────────────────────────────── -->
+  @if (!carregandoBalanco()) {
+    @if (balanco().length > 0) {
+      <section class="balanco-secao">
+        @for (item of balanco(); track item.parceiro_email) {
+          <div
+            class="balanco-card"
+            [class.balanco-card--positivo]="item.saldo > 0"
+            [class.balanco-card--negativo]="item.saldo < 0"
+          >
+            <div class="balanco-parceiro">{{ item.parceiro_nome ?? item.parceiro_email }}</div>
+            <div class="balanco-saldo">{{ moeda(absValor(item.saldo)) }}</div>
+            <div class="balanco-descricao">{{ rotuloBalanco(item) }}</div>
+            <div class="balanco-detalhes">
+              <span>Lançado por você: {{ moeda(item.total_eu_lancei) }}</span>
+              <span>Lançado por eles: {{ moeda(item.total_ele_lancou) }}</span>
+            </div>
+          </div>
+        }
+      </section>
+    }
+  } @else {
+    <div class="estado-carregando">carregando balanço...</div>
+  }
+
+  <!-- ─── Tabela de despesas compartilhadas ─────────────────────────────── -->
+  <section class="tabela-secao">
+    <h2 class="secao-titulo">Despesas compartilhadas</h2>
+
+    @if (carregandoLista()) {
+      <div class="estado-carregando">carregando despesas...</div>
+    } @else if (despesasOrdenadas().length === 0) {
+      <div class="estado-vazio">
+        <p>Nenhuma despesa compartilhada em {{ rotuloPeriodo() }}</p>
+        <button class="botao-vazio" type="button" (click)="abrirFormulario()">Criar primeira despesa</button>
+      </div>
+    } @else {
+      <div class="tabela-wrapper">
+        <table class="tabela">
+          <thead>
+            <tr>
+              <!-- Cabeçalhos ordenáveis -->
+              <th class="th-ordenavel" (click)="ordenarPor('data')">
+                DATA {{ iconeOrdem('data') }}
+              </th>
+              <th class="th-ordenavel" (click)="ordenarPor('descricao')">
+                DESCRIÇÃO {{ iconeOrdem('descricao') }}
+              </th>
+              <th class="th-ordenavel th-num" (click)="ordenarPor('valor')">
+                VALOR TOTAL {{ iconeOrdem('valor') }}
+              </th>
+              <th class="th-ordenavel th-num" (click)="ordenarPor('minha_parte')">
+                MINHA PARTE {{ iconeOrdem('minha_parte') }}
+              </th>
+              <th class="th-ordenavel" (click)="ordenarPor('situacao')">
+                SITUAÇÃO {{ iconeOrdem('situacao') }}
+              </th>
+              <th class="th-ordenavel" (click)="ordenarPor('status')">
+                DIVISÃO {{ iconeOrdem('status') }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (d of despesasOrdenadas(); track d.id) {
+              <tr class="tabela-linha">
+                <td class="td-data">{{ formatarData(d.data) }}</td>
+                <td class="td-desc">
+                  <span class="desc-texto">{{ d.descricao }}</span>
+                  @if (d.recorrente !== 'nao') {
+                    <span class="badge badge--recorrente">↻ {{ rotuloRecorrencia(d.recorrente) }}</span>
+                  }
+                </td>
+                <td class="td-num">{{ moeda(d.valor) }}</td>
+                <td class="td-num td-destaque">{{ moeda(minhaParte(d)) }}</td>
+                <td>
+                  <span class="badge" [class.badge--pago]="d.situacao === 'pago'" [class.badge--pendente]="d.situacao === 'pendente'">
+                    {{ d.situacao === 'pago' ? 'Pago' : 'Pendente' }}
+                  </span>
+                </td>
+                <td>
+                  @if (d.divisao) {
+                    <span class="badge"
+                      [class.badge--de-acordo]="d.divisao.status === 'de_acordo'"
+                      [class.badge--aguardando]="d.divisao.status === 'aguardando'"
+                      [class.badge--negado]="d.divisao.status === 'negado'">
+                      {{ rotuloStatus(d.divisao.status) }}
+                    </span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+
+</div>
+
+<!-- ─── Modal de nova despesa ────────────────────────────────────────────── -->
+@if (mostrarFormulario()) {
+  <div class="overlay" (click)="fecharFormulario()" role="dialog" aria-modal="true" aria-label="Nova despesa compartilhada">
+    <div class="modal-form" (click)="$event.stopPropagation()">
+
+      <div class="modal-form-cabecalho">
+        <h2 class="modal-form-titulo">Nova despesa</h2>
+        <button class="botao-fechar" type="button" (click)="fecharFormulario()" aria-label="Fechar">✕</button>
+      </div>
+
+      @if (sucessoForm()) {
+        <div class="form-sucesso">✓ Despesa criada com sucesso!</div>
+      } @else {
+        <form class="formulario" (ngSubmit)="salvarDespesa()">
+
+          <!-- Descrição -->
+          <div class="campo-grupo">
+            <label class="campo-rotulo" for="f-descricao">DESCRIÇÃO</label>
+            <input id="f-descricao" class="campo-input"
+              type="text"
+              [ngModel]="form.descricao()" (ngModelChange)="form.descricao.set($event)"
+              name="descricao"
+              placeholder="Ex: Aluguel, Supermercado..."
+              autocomplete="off" />
+          </div>
+
+          <!-- Valor + Data -->
+          <div class="campo-linha">
+            <div class="campo-grupo">
+              <label class="campo-rotulo" for="f-valor">VALOR (R$)</label>
+              <input id="f-valor" class="campo-input"
+                type="text" inputmode="decimal"
+                [ngModel]="form.valor()" (ngModelChange)="form.valor.set($event)"
+                name="valor"
+                placeholder="0,00" />
+            </div>
+            <div class="campo-grupo">
+              <label class="campo-rotulo" for="f-data">DATA</label>
+              <input id="f-data" class="campo-input"
+                type="date"
+                [ngModel]="form.data()" (ngModelChange)="form.data.set($event)"
+                name="data" />
+            </div>
+          </div>
+
+          <!-- Recorrência + Situação -->
+          <div class="campo-linha">
+            <div class="campo-grupo">
+              <label class="campo-rotulo" for="f-recorrente">REPETIÇÃO</label>
+              <select id="f-recorrente" class="campo-input campo-select"
+                [ngModel]="form.recorrente()" (ngModelChange)="form.recorrente.set($event)"
+                name="recorrente">
+                @for (op of opcoesRecorrencia; track op[0]) {
+                  <option [value]="op[0]">{{ op[1] }}</option>
+                }
+              </select>
+            </div>
+            <div class="campo-grupo">
+              <label class="campo-rotulo" for="f-situacao">SITUAÇÃO</label>
+              <select id="f-situacao" class="campo-input campo-select"
+                [ngModel]="form.situacao()" (ngModelChange)="form.situacao.set($event)"
+                name="situacao">
+                <option value="pendente">Pendente</option>
+                <option value="pago">Pago</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Toggle dividir -->
+          <div class="campo-toggle">
+            <input id="f-dividir" type="checkbox"
+              [ngModel]="dividirDespesa()" (ngModelChange)="dividirDespesa.set($event)"
+              name="dividir"
+              class="toggle-check" />
+            <label for="f-dividir" class="toggle-rotulo">Dividir esta despesa</label>
+          </div>
+
+          <!-- Campos de divisão (aparecem ao ativar o toggle) -->
+          @if (dividirDespesa()) {
+            <div class="campo-divisao">
+              <div class="campo-grupo">
+                <label class="campo-rotulo" for="f-email">E-MAIL DO PARCEIRO</label>
+                <input id="f-email" class="campo-input"
+                  type="email"
+                  [ngModel]="form.emailConvite()" (ngModelChange)="form.emailConvite.set($event)"
+                  name="emailConvite"
+                  placeholder="parceiro@email.com" />
+              </div>
+              <div class="campo-grupo">
+                <label class="campo-rotulo" for="f-pct">% DO PARCEIRO</label>
+                <input id="f-pct" class="campo-input"
+                  type="number" min="1" max="99"
+                  [ngModel]="form.porcentagem()" (ngModelChange)="form.porcentagem.set($event)"
+                  name="porcentagem"
+                  placeholder="50" />
+                <span class="campo-dica">Sua parte: {{ 100 - (+form.porcentagem() || 0) }}%</span>
+              </div>
+            </div>
+          }
+
+          <!-- Erro -->
+          @if (erroForm()) {
+            <div class="form-erro">{{ erroForm() }}</div>
+          }
+
+          <!-- Ações -->
+          <div class="form-acoes">
+            <button type="submit" class="botao-primario" [disabled]="carregandoForm()">
+              @if (carregandoForm()) { SALVANDO... } @else { SALVAR DESPESA }
+            </button>
+            <button type="button" class="botao-cancelar" (click)="fecharFormulario()">
+              CANCELAR
+            </button>
+          </div>
+
+        </form>
+      }
+
+    </div>
+  </div>
+}

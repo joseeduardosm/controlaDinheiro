@@ -1,0 +1,150 @@
+<!-- Modal bloqueante — cobre toda a tela, não pode ser fechado por clique externo -->
+<div class="overlay" role="dialog" aria-modal="true" aria-label="Aprovação de pendências compartilhadas">
+
+  <div class="modal">
+
+    <!-- Cabeçalho -->
+    <div class="modal-cabecalho">
+      <h2 class="modal-titulo">Pendências compartilhadas</h2>
+      <span class="modal-progresso">{{ posicao() }} de {{ total() }} pendente{{ total() > 1 ? 's' : '' }}</span>
+    </div>
+
+    <!-- Conteúdo do item atual -->
+    @if (itemAtual(); as item) {
+      <div class="modal-corpo">
+
+        <!-- ─── DESPESA COMPARTILHADA ──────────────────────────────────────── -->
+        @if (item.tipo === 'despesa') {
+
+          <p class="criador-label">
+            <span class="criador-nome">{{ item.dados.nome_criador ?? 'Alguém' }}</span>
+            compartilhou uma despesa com você
+          </p>
+
+          <div class="despesa-info">
+            <h3 class="despesa-descricao">{{ item.dados.despesa.descricao }}</h3>
+
+            <div class="despesa-meta">
+              @if (item.dados.despesa.recorrente !== 'nao') {
+                <span class="badge badge--recorrente">↻ {{ rotuloRecorrencia(item.dados.despesa.recorrente) }}</span>
+              }
+              <span class="badge"
+                [class.badge--pago]="item.dados.despesa.situacao === 'pago'"
+                [class.badge--pendente]="item.dados.despesa.situacao === 'pendente'">
+                {{ item.dados.despesa.situacao === 'pago' ? 'Pago' : 'Pendente' }}
+              </span>
+            </div>
+
+            <p class="despesa-data">{{ formatarData(item.dados.despesa.data) }}</p>
+          </div>
+
+          <div class="valores">
+            <div class="valor-item">
+              <span class="valor-rotulo">VALOR TOTAL</span>
+              <span class="valor-numero">{{ moeda(item.dados.despesa.valor) }}</span>
+            </div>
+            <div class="valor-separador" aria-hidden="true">→</div>
+            <div class="valor-item valor-item--destaque">
+              <span class="valor-rotulo">SUA PARTE ({{ item.dados.despesa.divisao?.porcentagem }}%)</span>
+              <span class="valor-numero valor-numero--destaque">{{ moeda(item.dados.minha_parte) }}</span>
+            </div>
+          </div>
+
+          @if (item.dados.despesa.comprovante_url) {
+            <a [href]="item.dados.despesa.comprovante_url" target="_blank" rel="noopener" class="link-comprovante">
+              VER COMPROVANTE →
+            </a>
+          }
+
+          @if (item.dados.despesa.recorrente !== 'nao') {
+            <p class="aviso-recorrente">
+              ⓘ Ao aceitar, você confirma esta despesa para todos os ciclos futuros.
+            </p>
+          }
+
+        }
+
+        <!-- ─── LANÇAMENTO DE CARTÃO COMPARTILHADO ────────────────────────── -->
+        @if (item.tipo === 'cartao') {
+
+          <p class="criador-label">
+            Lançamento compartilhado no <span class="criador-nome">{{ item.dados.cartao_banco }}</span>
+          </p>
+
+          <div class="despesa-info">
+            <h3 class="despesa-descricao">{{ item.dados.descricao }}</h3>
+
+            <div class="despesa-meta">
+              <span class="badge badge--recorrente">
+                {{ item.dados.parcela_atual }}/{{ item.dados.parcela_total }} parcelas
+              </span>
+            </div>
+
+            @if (item.dados.data_vencimento) {
+              <p class="despesa-data">Vence em {{ formatarData(item.dados.data_vencimento) }}</p>
+            }
+          </div>
+
+          <div class="valores">
+            <div class="valor-item">
+              <span class="valor-rotulo">VALOR DA PARCELA</span>
+              <span class="valor-numero">{{ moeda(item.dados.valor_parcela) }}</span>
+            </div>
+            <div class="valor-separador" aria-hidden="true">→</div>
+            <div class="valor-item valor-item--destaque">
+              <span class="valor-rotulo">SUA PARTE ({{ item.dados.minha_porcentagem }}%)</span>
+              <span class="valor-numero valor-numero--destaque">{{ moeda(item.dados.minha_parte) }}</span>
+            </div>
+          </div>
+
+          <p class="aviso-recorrente">
+            ⓘ Ao aceitar, você confirma sua parte em todas as {{ item.dados.parcela_total }} parcelas.
+          </p>
+
+        }
+
+        <!-- ─── Erro da API ─────────────────────────────────────────────────── -->
+        @if (erro()) {
+          <div class="erro-api">{{ erro() }}</div>
+        }
+
+        <!-- ─── Botões normais ──────────────────────────────────────────────── -->
+        @if (!modoNegar()) {
+          <div class="acoes">
+            <button class="botao-primario" (click)="deAcordo()" [disabled]="carregando()" type="button">
+              @if (carregando()) { AGUARDE... } @else { ✓ DE ACORDO }
+            </button>
+            <button class="botao-negar" (click)="iniciarNegacao()" [disabled]="carregando()" type="button">
+              NEGAR →
+            </button>
+          </div>
+        }
+
+        <!-- ─── Campo de justificativa para negar ──────────────────────────── -->
+        @if (modoNegar()) {
+          <div class="secao-negar">
+            <label class="rotulo-justificativa" for="justificativa">POR QUÊ VOCÊ NEGA ESTA PENDÊNCIA?</label>
+            <textarea
+              id="justificativa"
+              class="campo-justificativa"
+              [ngModel]="justificativa()"
+              (ngModelChange)="justificativa.set($event)"
+              placeholder="Descreva o motivo da recusa..."
+              rows="3"
+            ></textarea>
+            <div class="acoes">
+              <button class="botao-primario botao-primario--negar" (click)="confirmarNegacao()" [disabled]="carregando()" type="button">
+                @if (carregando()) { AGUARDE... } @else { CONFIRMAR RECUSA }
+              </button>
+              <button class="botao-cancelar" (click)="cancelarNegacao()" [disabled]="carregando()" type="button">
+                VOLTAR
+              </button>
+            </div>
+          </div>
+        }
+
+      </div>
+    }
+
+  </div>
+</div>

@@ -1,0 +1,367 @@
+/**
+ * Estilos da tela de login/cadastro — sistema de design Monad (DESIGN.md)
+ *
+ * Regras fundamentais do design system que este arquivo respeita:
+ *   • Fundo sempre Parchment (#f6f3f1) — NUNCA branco puro (#fff)
+ *   • Tipografia de títulos: Crimson Pro (substituto de Untitled Serif), peso 400
+ *   • Tipografia funcional: JetBrains Mono (substituto de ABC Diatype Mono)
+ *   • Cor de ação primária: Lake Blue (#2b59d1) — apenas UM botão por tela
+ *   • Bordas: 1px sólido Ash (#cecac8) — sem sombras nos cards
+ *   • Border-radius: botões = 100px, card = 40px
+ *   • Sem negrito nos títulos — a elegância vem do peso 400 e do tracking
+ */
+
+/* ─── Página ───────────────────────────────────────────────────────────────── */
+
+.pagina {
+  min-height: 100vh;
+  background-color: var(--color-parchment); /* superfície Parchment obrigatória */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  font-family: var(--font-mono);
+  padding: 40px 16px; /* respiro lateral em mobile */
+}
+
+/* ─── Degradê decorativo ───────────────────────────────────────────────────── */
+
+/**
+ * "Atmospheric wash" — elemento puramente decorativo, sem interação.
+ * Usa Coral, Sky Blue e Mint da paleta de suporte em baixa opacidade.
+ * O blur pesado (60px) garante que nunca apareça nítido — é uma lavagem de cor.
+ * Posicionado fora da viewport superior-direita para criar profundidade sutil.
+ */
+.fundo-degradê {
+  position: absolute;
+  width: 700px;
+  height: 700px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 40% 40%, rgba(255, 148, 115, 0.25) 0%, rgba(160, 181, 235, 0.18) 50%, transparent 75%),
+    radial-gradient(circle at 70% 70%, rgba(167, 252, 205, 0.15) 0%, transparent 60%);
+  filter: blur(60px);
+  pointer-events: none; /* invisível para interações do usuário */
+  top: -200px;
+  right: -150px;
+}
+
+/* ─── Container central ────────────────────────────────────────────────────── */
+
+.container {
+  width: 100%;
+  max-width: 420px;    /* largura máxima do card em desktop */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;           /* espaçamento de seção do sistema (--spacing-40) */
+  position: relative;
+  z-index: 1;          /* fica acima do degradê decorativo */
+}
+
+/* ─── Bloco de marca ───────────────────────────────────────────────────────── */
+
+.marca {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+/* Variável de fundo para a máscara do interlaçamento SVG */
+.pagina { --fundo-mascara: var(--color-parchment); }
+
+/* Símbolo SVG dos dois anéis entrelaçados */
+.marca-simbolo {
+  width: 72px;
+  height: auto;
+  display: block;
+  margin-bottom: 4px;
+}
+
+/**
+ * Nome do app — tipografia display da marca.
+ * Usa a fonte serifada a 48px (tamanho heading-lg do design system).
+ * Tracking -0.96px = -0.02em × 48px, conforme tabela tipográfica do DESIGN.md.
+ * Peso 400: nunca negrito — regra fundamental do sistema.
+ */
+.marca-nome {
+  font-family: var(--font-serif);
+  font-size: 48px;
+  font-weight: 400;
+  letter-spacing: -0.96px;
+  line-height: 1.2;
+  color: var(--color-off-black);
+}
+
+/* Slogan em mono, cor Smoke — texto terciário mais discreto */
+.marca-slogan {
+  font-family: var(--font-mono);
+  font-size: 14px; /* --text-body-sm */
+  font-weight: 400;
+  letter-spacing: -0.28px;
+  color: var(--color-smoke);
+}
+
+/* ─── Card ─────────────────────────────────────────────────────────────────── */
+
+/**
+ * Card principal do formulário.
+ * Seguindo o componente "Feature Card" do DESIGN.md:
+ *   • Fundo Parchment (não Periwinkle Mist, pois não é o card destacado)
+ *   • 1px solid Ash — sem sombra
+ *   • border-radius: 40px (--radius-cards)
+ *   • padding: 40px (--card-padding)
+ */
+.card {
+  width: 100%;
+  background-color: var(--color-parchment);
+  border: 1px solid var(--color-ash);
+  border-radius: 40px;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px; /* respiro entre cabeçalho, formulário e link de alternância */
+}
+
+/* Cabeçalho do card: título + subtítulo */
+.card-cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/**
+ * Título do card em serifado 32px.
+ * Altera dinamicamente entre "Entrar" e "Criar conta" via Signal.
+ */
+.card-titulo {
+  font-family: var(--font-serif);
+  font-size: 32px; /* --text-heading-sm */
+  font-weight: 400;
+  letter-spacing: -0.64px;
+  line-height: 1.2;
+  color: var(--color-off-black);
+}
+
+/* Subtítulo descritivo em mono, cor Smoke */
+.card-subtitulo {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--color-smoke);
+  letter-spacing: -0.28px;
+}
+
+/* ─── Formulário ───────────────────────────────────────────────────────────── */
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* espaçamento entre campos */
+}
+
+/* Grupo de campo: rótulo + input + mensagem de erro */
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* --spacing-8 */
+}
+
+/**
+ * Rótulo de campo — 12px uppercase mono com tracking positivo.
+ * Segue o padrão "nav labels e badges usam uppercase com tracking mais apertado"
+ * do DESIGN.md, aqui adaptado para labels de formulário.
+ */
+.rotulo {
+  font-family: var(--font-mono);
+  font-size: 12px; /* --text-caption */
+  font-weight: 500; /* --font-weight-medium: reservado para labels de UI */
+  letter-spacing: 0.04em;
+  color: var(--color-graphite);
+  text-transform: uppercase;
+}
+
+/* Wrapper relativo para posicionar o ícone do olho dentro do input de senha */
+.entrada-com-icone {
+  position: relative;
+}
+
+/**
+ * Input de texto — estilizado como pill (100px border-radius).
+ * Segue o padrão de border-radius total para inputs do design system.
+ * Estados:
+ *   :focus      → borda Off-Black (feedback de foco claro)
+ *   .entrada-erro → borda Coral (alerta de erro)
+ * O padding-right extra (.entrada-com-icone &) evita sobreposição com o ícone.
+ */
+.entrada {
+  width: 100%;
+  height: 48px;
+  padding: 0 16px;
+  background-color: var(--color-parchment);
+  border: 1px solid var(--color-ash);
+  border-radius: 100px; /* pill shape obrigatório para inputs */
+  font-family: var(--font-mono);
+  font-size: 16px; /* --text-body */
+  font-weight: 400;
+  letter-spacing: -0.4px;
+  color: var(--color-off-black);
+  outline: none; /* estilizamos o foco via border-color, não outline */
+  transition: border-color 0.15s ease;
+  appearance: none; /* remove estilo nativo de alguns browsers */
+
+  &::placeholder {
+    color: var(--color-ash); /* placeholder na cor da borda — discreto */
+  }
+
+  &:focus {
+    border-color: var(--color-off-black); /* feedback de foco: borda Off-Black */
+  }
+
+  &.entrada-erro {
+    border-color: var(--color-coral); /* Coral como cor de erro */
+  }
+
+  /* Quando dentro do wrapper com ícone, abre espaço para o botão do olho */
+  .entrada-com-icone & {
+    padding-right: 48px;
+  }
+}
+
+/* Botão de alternar visibilidade da senha — absolutamente posicionado */
+.botao-olho {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--color-smoke);
+  padding: 4px;
+  line-height: 1;
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: var(--color-off-black); /* feedback hover suave */
+  }
+}
+
+/* Mensagem de erro de validação — 12px Coral, recuada para alinhar com texto do input */
+.erro {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-coral); /* Coral como indicador de erro */
+  letter-spacing: -0.4px;
+  padding-left: 16px; /* alinha visualmente com o texto dentro do input pill */
+}
+
+/* Caixa de erro retornado pela API */
+.erro-api {
+  background: rgba(201, 79, 53, 0.08);
+  border: 1px solid var(--color-coral);
+  border-radius: 16px;
+  padding: 10px 16px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--color-coral);
+  letter-spacing: -0.3px;
+  text-align: center;
+}
+
+/* ─── Botão primário ───────────────────────────────────────────────────────── */
+
+/**
+ * Botão de ação principal — Lake Blue (#2b59d1).
+ *
+ * IMPORTANTE: conforme DESIGN.md, Lake Blue é reservado EXCLUSIVAMENTE
+ * para a única ação primária da tela. Não usar em outros elementos.
+ *
+ * Segue o componente "Primary Pill Button (Blue)":
+ *   • Lake Blue fill
+ *   • Texto branco, mono 14px uppercase
+ *   • border-radius: 100px (--radius-buttons)
+ *   • padding: 16px 32px implícito via height + width: 100%
+ */
+.botao-primario {
+  width: 100%;
+  height: 48px;
+  background-color: var(--color-lake-blue);
+  color: #fff;
+  border: none;
+  border-radius: 100px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+  margin-top: 4px;
+
+  &:hover  { opacity: 0.88; }
+  &:active { opacity: 0.75; }
+}
+
+/* ─── Alternância de modo ──────────────────────────────────────────────────── */
+
+/* Linha "Não tem conta? CADASTRE-SE →" */
+.alternar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+/* Texto descritivo — Smoke para ficar em segundo plano */
+.alternar-texto {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--color-smoke);
+  letter-spacing: -0.28px;
+}
+
+/**
+ * Botão de alternância — estilo "Text Link" do DESIGN.md:
+ * sem fundo, sem borda, uppercase mono, underline decorativo.
+ * Usar Off-Black, não Lake Blue — Lake Blue já está no botão primário.
+ */
+.botao-alternar {
+  background: none;
+  border: none;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-off-black);
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--color-ash); /* underline discreto em repouso */
+  transition: text-decoration-color 0.15s ease;
+
+  &:hover {
+    text-decoration-color: var(--color-off-black); /* destaca ao passar o mouse */
+  }
+}
+
+/* ─── Responsividade mobile ────────────────────────────────────────────────── */
+
+@media (max-width: 480px) {
+  /* Reduz padding e raio do card em telas menores */
+  .card {
+    padding: 32px 24px;
+    border-radius: 32px;
+  }
+
+  /* Reduz título da marca de 48px para 40px */
+  .marca-nome {
+    font-size: 40px;
+  }
+}

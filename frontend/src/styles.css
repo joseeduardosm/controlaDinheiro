@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+@theme {
+  /* Colors */
+  --color-parchment: #f6f3f1;
+  --color-lake-blue: #2b59d1;
+  --color-periwinkle-mist: #cfdaf5;
+  --color-sky-blue: #a0b5eb;
+  --color-mint: #a7fccd;
+  --color-coral: #ff9473;
+  --color-gold: #ecda98;
+  --color-crimson: #f37a0a;
+  --color-off-black: #242424;
+  --color-ink: #000000;
+  --color-graphite: #4e4d4d;
+  --color-smoke: #797776;
+  --color-ash: #cecac8;
+
+  /* Typography */
+  --font-serif: 'Crimson Pro', 'Georgia', 'Times New Roman', ui-serif, serif;
+  --font-mono: 'JetBrains Mono', 'IBM Plex Mono', 'Space Mono', ui-monospace, monospace;
+
+  /* Border Radius */
+  --radius-card: 40px;
+  --radius-button: 100px;
+  --radius-pill: 9999px;
+
+  /* Shadows */
+  --shadow-md: rgba(0, 0, 0, 0.1) 0px 0px 10px 0px;
+}
+
+:root {
+  --color-parchment: #f6f3f1;
+  --color-lake-blue: #2b59d1;
+  --color-periwinkle-mist: #cfdaf5;
+  --color-sky-blue: #a0b5eb;
+  --color-mint: #a7fccd;
+  --color-coral: #ff9473;
+  --color-gold: #ecda98;
+  --color-crimson: #f37a0a;
+  --color-off-black: #242424;
+  --color-ink: #000000;
+  --color-graphite: #4e4d4d;
+  --color-smoke: #797776;
+  --color-ash: #cecac8;
+  --font-serif: 'Crimson Pro', 'Georgia', 'Times New Roman', ui-serif, serif;
+  --font-mono: 'JetBrains Mono', 'IBM Plex Mono', 'Space Mono', ui-monospace, monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-mono);
+  background-color: var(--color-parchment);
+  color: var(--color-off-black);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+}
